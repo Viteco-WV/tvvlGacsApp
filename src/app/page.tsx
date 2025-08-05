@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleStartOpnamen = () => {
-    router.push('/opnamen/algemeen');
+    router.push('/opnamen');
   };
 
   return (
