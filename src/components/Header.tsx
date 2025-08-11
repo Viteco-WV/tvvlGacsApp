@@ -1,7 +1,12 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 export default function Header() {
+  const router = useRouter();
+
   const handleSave = () => {
-    // Hier kunnen we later functionaliteit toevoegen voor tussentijds opslaan
-    console.log('Tussentijds opslaan geklikt');
+    router.push('/opnamen');
   };
 
   return (
@@ -16,7 +21,7 @@ export default function Header() {
                 className="h-8 w-auto"
               />
             </div>
-            <h1 className="text-xl font-semibold text-gray-800 flex-1 text-center">
+            <h1 className="text-xl font-bold text-gray-800 flex-1 text-center">
               GACS audit app
             </h1>
             <div className="flex-1 flex justify-end">

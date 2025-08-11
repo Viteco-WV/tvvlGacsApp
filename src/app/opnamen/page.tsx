@@ -83,12 +83,12 @@ export default function OpnamenOverviewPage() {
     router.push('/opnamen/algemeen');
   };
 
-  const handleContinueAudit = (record: AuditRecord) => {
+  const handleContinueAudit = () => {
     // Laad de data en ga naar de voltooid pagina
     router.push('/opnamen/voltooid');
   };
 
-  const handleDeleteAudit = (recordId: string) => {
+  const handleDeleteAudit = () => {
     if (confirm('Weet je zeker dat je deze audit wilt verwijderen?')) {
       localStorage.removeItem('gacsBuildingData');
       localStorage.removeItem('gacsOpnamenData');
@@ -141,9 +141,25 @@ export default function OpnamenOverviewPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f9fb]">
+      {/* Header van home page */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/TVVL-logo-los.png" 
+                alt="TVVL Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold text-gray-800">GACS Platform</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
+          {/* Page Header */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -216,13 +232,13 @@ export default function OpnamenOverviewPage() {
                       
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleContinueAudit(record)}
+                          onClick={() => handleContinueAudit()}
                           className="bg-[#c7d316] text-[#343234] px-4 py-2 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-medium text-sm"
                         >
                           Bekijken
                         </button>
                         <button
-                          onClick={() => handleDeleteAudit(record.id)}
+                          onClick={() => handleDeleteAudit()}
                           className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium text-sm"
                         >
                           Verwijderen
@@ -264,8 +280,8 @@ export default function OpnamenOverviewPage() {
             <ul className="text-sm text-blue-700 space-y-2">
               <li>• Alle audits worden lokaal opgeslagen in uw browser</li>
               <li>• U kunt meerdere audits beheren en vergelijken</li>
-              <li>• Klik op "Bekijken" om een audit te openen</li>
-              <li>• Gebruik "Verwijderen" om een audit permanent te wissen</li>
+              <li>• Klik op &quot;Bekijken&quot; om een audit te openen</li>
+              <li>• Gebruik &quot;Verwijderen&quot; om een audit permanent te wissen</li>
               <li>• Start een nieuwe audit om een ander gebouw te registreren</li>
             </ul>
           </div>

@@ -14,13 +14,13 @@ interface BuildingData {
 }
 
 interface OpnamenData {
-  verwarmingssysteem?: any;
-  warmTapwater?: any;
-  airconditioning?: any;
-  ventilatie?: any;
-  verlichting?: any;
-  zonwering?: any;
-  gebouwmanagement?: any;
+  verwarmingssysteem?: Record<string, unknown>;
+  warmTapwater?: Record<string, unknown>;
+  airconditioning?: Record<string, unknown>;
+  ventilatie?: Record<string, unknown>;
+  verlichting?: Record<string, unknown>;
+  zonwering?: Record<string, unknown>;
+  gebouwmanagement?: Record<string, unknown>;
 }
 
 export default function VoltooidPage() {
@@ -74,12 +74,7 @@ export default function VoltooidPage() {
     }
   };
 
-  const handleNewOpnamen = () => {
-    // Wis alle data en start opnieuw
-    localStorage.removeItem('gacsBuildingData');
-    localStorage.removeItem('gacsOpnamenData');
-    router.push('/');
-  };
+  // handleNewOpnamen function removed - unused
 
   const handleEditSection = (sectionPath: string) => {
     router.push(sectionPath);

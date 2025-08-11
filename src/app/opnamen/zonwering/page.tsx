@@ -110,19 +110,19 @@ export default function ZonweringPage() {
     router.push('/opnamen/gebouwmanagement');
   };
 
-  const renderQuestion = (question: any) => {
-    const currentAnswer = answers[question.id] || '';
+  const renderQuestion = (question: Record<string, unknown>) => {
+    const currentAnswer = (answers[question.id as string] as string) || '';
 
     switch (question.type) {
       case 'select':
         return (
           <select
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           >
             <option value="">Selecteer een optie</option>
-            {question.options.map((option: string) => (
+            {(question.options as string[])?.map((option: string) => (
               <option key={option} value={option}>
                 {option}
               </option>
@@ -135,7 +135,7 @@ export default function ZonweringPage() {
           <input
             type="number"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         );
@@ -145,7 +145,7 @@ export default function ZonweringPage() {
           <input
             type="date"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         );
@@ -154,7 +154,7 @@ export default function ZonweringPage() {
         return (
           <textarea
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             rows={4}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Voer uw antwoord in..."
@@ -166,7 +166,7 @@ export default function ZonweringPage() {
           <input
             type="text"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Voer uw antwoord in..."
           />
@@ -203,7 +203,7 @@ export default function ZonweringPage() {
             <div className="p-8">
               <div className="space-y-8">
                 {questions.map((question, index) => (
-                  <div key={question.id} className="border-b border-gray-200 pb-6">
+                  <div key={question.id as string} className="border-b border-gray-200 pb-6">
                     <h3 className="text-lg font-semibold text-[#343234] mb-4">
                       Vraag {index + 1}: {question.question}
                     </h3>

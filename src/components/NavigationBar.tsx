@@ -3,9 +3,7 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-interface NavigationBarProps {
-  currentSection: string;
-}
+// NavigationBar component doesn't need props
 
 const sections = [
   { id: 'algemeen', name: 'Algemeen', path: '/opnamen/algemeen' },
@@ -19,7 +17,7 @@ const sections = [
   { id: 'voltooid', name: 'Voltooid', path: '/opnamen/voltooid' }
 ];
 
-export default function NavigationBar({ currentSection }: NavigationBarProps) {
+export default function NavigationBar() {
   const router = useRouter();
   const pathname = usePathname();
   const [completedSections, setCompletedSections] = useState<string[]>([]);

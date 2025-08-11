@@ -15,7 +15,7 @@ interface BuildingData {
 
 export default function VerwarmingssysteemPage() {
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const router = useRouter();
 
   // Vragen voor verwarmingssysteem
@@ -75,7 +75,7 @@ export default function VerwarmingssysteemPage() {
     }
   }, [router]);
 
-  const handleAnswerChange = (questionId: string, value: any) => {
+  const handleAnswerChange = (questionId: string, value: unknown) => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: value
@@ -105,19 +105,19 @@ export default function VerwarmingssysteemPage() {
     router.push('/opnamen/algemeen');
   };
 
-  const renderQuestion = (question: any) => {
-    const currentAnswer = answers[question.id] || '';
+  const renderQuestion = (question: Record<string, unknown>) => {
+    const currentAnswer = (answers[question.id as string] as string) || '';
 
     switch (question.type) {
       case 'select':
         return (
           <select
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+            className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
           >
             <option value="">Selecteer een optie</option>
-            {question.options.map((option: string) => (
+            {(question.options as string[])?.map((option: string) => (
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
@@ -126,14 +126,14 @@ export default function VerwarmingssysteemPage() {
       case 'radio':
         return (
           <div className="space-y-2">
-            {question.options.map((option: string) => (
+            {(question.options as string[])?.map((option: string) => (
               <label key={option} className="flex items-center space-x-2">
                 <input
                   type="radio"
-                  name={question.id}
+                  name={question.id as string}
                   value={option}
                   checked={currentAnswer === option}
-                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
                   className="text-[#343234] focus:ring-green-500"
                 />
                 <span>{option}</span>
@@ -147,10 +147,10 @@ export default function VerwarmingssysteemPage() {
           <input
             type="number"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            min={question.min}
-            max={question.max}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+            min={question.min as number}
+            max={question.max as number}
+            className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
           />
         );
 
@@ -159,8 +159,8 @@ export default function VerwarmingssysteemPage() {
           <input
             type="date"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+            className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
           />
         );
 
@@ -168,9 +168,9 @@ export default function VerwarmingssysteemPage() {
         return (
           <textarea
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
             placeholder="Voer uw antwoord in..."
           />
         );
@@ -180,8 +180,8 @@ export default function VerwarmingssysteemPage() {
           <input
             type="text"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+            className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
             placeholder="Voer uw antwoord in..."
           />
         );
@@ -222,7 +222,7 @@ export default function VerwarmingssysteemPage() {
             {/* All Questions */}
             <div className="space-y-8">
               {questions.map((question, index) => (
-                <div key={question.id} className="border-b border-gray-200 pb-6">
+                <div key={question.id as string} className="border-b border-gray-200 pb-6">
                   <h3 className="text-lg font-semibold text-[#343234] mb-4">
                     Vraag {index + 1}: {question.question}
                   </h3>

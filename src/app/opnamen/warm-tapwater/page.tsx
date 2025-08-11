@@ -112,19 +112,19 @@ export default function WarmTapwaterPage() {
     router.push('/opnamen/verwarmingssysteem');
   };
 
-  const renderQuestion = (question: any) => {
-    const currentAnswer = answers[question.id] || '';
+  const renderQuestion = (question: Record<string, unknown>) => {
+    const currentAnswer = (answers[question.id as string] as string) || '';
 
     switch (question.type) {
       case 'select':
         return (
           <select
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           >
             <option value="">Selecteer een optie</option>
-            {question.options.map((option: string) => (
+            {(question.options as string[])?.map((option: string) => (
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
@@ -133,14 +133,14 @@ export default function WarmTapwaterPage() {
       case 'radio':
         return (
           <div className="space-y-2">
-            {question.options.map((option: string) => (
+            {(question.options as string[])?.map((option: string) => (
               <label key={option} className="flex items-center space-x-2 font-bold">
                 <input
                   type="radio"
-                  name={question.id}
+                  name={question.id as string}
                   value={option}
                   checked={currentAnswer === option}
-                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
                   className="text-[#343234] focus:ring-green-500"
                 />
                 <span>{option}</span>
@@ -155,12 +155,12 @@ export default function WarmTapwaterPage() {
             <input
               type="number"
               value={currentAnswer}
-              onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-              min={question.min}
-              max={question.max}
+              onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+              min={question.min as number}
+              max={question.max as number}
               className="flex-1 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
-            {question.unit && <span className="text-gray-600">{question.unit}</span>}
+            {(question.unit as string) && <span className="text-gray-600">{question.unit as string}</span>}
           </div>
         );
 
@@ -169,7 +169,7 @@ export default function WarmTapwaterPage() {
           <input
             type="date"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         );
@@ -178,7 +178,7 @@ export default function WarmTapwaterPage() {
         return (
           <textarea
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             rows={4}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Voer uw antwoord in..."
@@ -190,7 +190,7 @@ export default function WarmTapwaterPage() {
           <input
             type="text"
             value={currentAnswer}
-            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Voer uw antwoord in..."
           />
@@ -231,7 +231,7 @@ export default function WarmTapwaterPage() {
               {/* All Questions */}
               <div className="space-y-8">
                 {questions.map((question, index) => (
-                  <div key={question.id} className="border-b border-gray-200 pb-6">
+                  <div key={question.id as string} className="border-b border-gray-200 pb-6">
                     <h3 className="text-lg font-semibold text-[#343234] mb-4">
                       Vraag {index + 1}: {question.question}
                     </h3>

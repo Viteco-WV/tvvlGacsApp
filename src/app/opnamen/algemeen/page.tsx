@@ -106,14 +106,14 @@ export default function AlgemeenPage() {
               
                                             // Transform BAG data naar ons formaat
                const transformedAddresses = addresses.map((addr: Record<string, unknown>) => ({
-                 openbareRuimteNaam: (addr.openbareRuimte as any)?.openbareRuimteNaam || (addr as any).openbareRuimteNaam,
+                 openbareRuimteNaam: (addr.openbareRuimte as Record<string, unknown>)?.openbareRuimteNaam as string || (addr.openbareRuimteNaam as string) || '',
                  huisnummer: addr.huisnummer as string,
                  huisletter: (addr.huisletter as string) || '',
                  huisnummertoevoeging: (addr.huisnummertoevoeging as string) || '',
                  postcode: addr.postcode as string,
-                 woonplaatsNaam: (addr.woonplaats as any)?.woonplaatsNaam || (addr as any).woonplaatsNaam,
+                 woonplaatsNaam: (addr.woonplaats as Record<string, unknown>)?.woonplaatsNaam as string || (addr.woonplaatsNaam as string) || '',
                  verblijfsobjectIdentificatie: addr.verblijfsobjectIdentificatie as string,
-                 oppervlakte: (addr.verblijfsobject as any)?.oppervlakte || null
+                 oppervlakte: (addr.verblijfsobject as Record<string, unknown>)?.oppervlakte as number || null
                }));
              
              setAddressResults(transformedAddresses);
@@ -278,7 +278,7 @@ export default function AlgemeenPage() {
                     name="buildingName"
                     value={buildingData.buildingName}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Voer de naam van het gebouw in"
                     required
                   />
@@ -296,7 +296,7 @@ export default function AlgemeenPage() {
                       name="postcode"
                       value={buildingData.postcode}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                       placeholder="1234 AB"
                       maxLength={7}
                     />
@@ -311,7 +311,7 @@ export default function AlgemeenPage() {
                       name="houseNumber"
                       value={buildingData.houseNumber}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                       placeholder="123"
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function AlgemeenPage() {
                       name="houseAddition"
                       value={buildingData.houseAddition}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                       placeholder="A, B, 2"
                     />
                   </div>
@@ -397,7 +397,7 @@ export default function AlgemeenPage() {
                     name="address"
                     value={buildingData.address}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Straatnaam en huisnummer, plaats"
                     required
                   />
@@ -414,7 +414,7 @@ export default function AlgemeenPage() {
                       name="buildingArea"
                       value={buildingData.buildingArea}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                       placeholder="Oppervlakte in m²"
                       readOnly
                     />
@@ -430,7 +430,7 @@ export default function AlgemeenPage() {
                     name="buildingType"
                     value={buildingData.buildingType}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                   >
                     <option value="">Selecteer type gebouw</option>
                     <option value="kantoor">Kantoor</option>
@@ -453,7 +453,7 @@ export default function AlgemeenPage() {
                     name="energyLabel"
                     value={buildingData.energyLabel}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                   >
                     <option value="">Selecteer energielabel</option>
                     <option value="A+++">A+++</option>
@@ -480,7 +480,7 @@ export default function AlgemeenPage() {
                     name="contactPerson"
                     value={buildingData.contactPerson}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Naam van de contactpersoon"
                   />
                 </div>
@@ -495,7 +495,7 @@ export default function AlgemeenPage() {
                     name="date"
                     value={buildingData.date}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                   />
                 </div>
 

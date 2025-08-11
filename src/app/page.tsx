@@ -16,14 +16,18 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-[#B7D840] rounded-full"></div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/TVVL-logo-los.png" 
+                alt="TVVL Logo" 
+                className="h-8 w-auto"
+              />
               <span className="text-xl font-bold text-gray-800">GACS Platform</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#waarom" className="text-gray-600 hover:text-[#7BA800]">Waarom deze tool</a>
-              <a href="#voorbeelden" className="text-gray-600 hover:text-[#7BA800]">Voorbeelden</a>
-              <a href="#doorontwikkeling" className="text-gray-600 hover:text-[#7BA800]">Doorontwikkeling</a>
+              <a href="#waarom" className="text-gray-600 hover:text-[#7BA800] font-medium">Waarom deze tool</a>
+              <a href="#voorbeelden" className="text-gray-600 hover:text-[#7BA800] font-medium">Voorbeelden</a>
+              <a href="#doorontwikkeling" className="text-gray-600 hover:text-[#7BA800] font-medium">Doorontwikkeling</a>
             </nav>
             <div className="flex items-center space-x-4">
               <button 
@@ -38,7 +42,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 bg-green-50">
+      <section id="hero" className="min-h-screen bg-green-50 flex items-center relative pb-32">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text and Buttons */}
@@ -98,10 +102,30 @@ export default function Home() {
             </div>
           </div>
         </div>
+        
+        {/* Scroll down arrow */}
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="bg-white rounded-full p-3 shadow-lg border-2 border-[#7BA800]">
+            <svg 
+              className="w-8 h-8 text-[#7BA800] cursor-pointer hover:text-[#B7D840] transition-colors duration-200" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={3} 
+                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+              />
+            </svg>
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section id="features" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">

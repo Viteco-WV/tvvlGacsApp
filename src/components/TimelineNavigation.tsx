@@ -10,8 +10,8 @@ const sections = [
   { id: 'ventilatie', name: 'Ventilatie', path: '/opnamen/ventilatie', storageKey: 'ventilatie' },
   { id: 'verlichting', name: 'Verlichting', path: '/opnamen/verlichting', storageKey: 'verlichting' },
   { id: 'airconditioning', name: 'Koeling\nSysteem', path: '/opnamen/airconditioning', storageKey: 'airconditioning' },
-  { id: 'zonwering', name: 'Zonwering', path: '/opnamen/zonwering', storageKey: 'zonwering' },
   { id: 'gebouwmanagement', name: 'Gebouw\nManagement', path: '/opnamen/gebouwmanagement', storageKey: 'gebouwmanagement' },
+  { id: 'zonwering', name: 'Zonwering', path: '/opnamen/zonwering', storageKey: 'zonwering' },
   { id: 'voltooid', name: 'Voltooid', path: '/opnamen/voltooid', storageKey: 'voltooid' }
 ];
 
@@ -43,8 +43,19 @@ export default function TimelineNavigation() {
     }
   }, [pathname]);
 
-  const handleSectionClick = (path: string) => {
-    console.log('Clicking on section with path:', path);
+  const handleSectionClick = (path: string, sectionId: string) => {
+    // Special handling for voltooid section
+    if (sectionId === 'voltooid') {
+      // Only allow navigation to voltooid if all other sections are completed
+      const allSectionsCompleted = sections.slice(0, -1).every(section => 
+        completedSections.includes(section.storageKey)
+      );
+      
+      if (!allSectionsCompleted) {
+        return;
+      }
+    }
+    
     router.push(path);
   };
 
@@ -59,7 +70,15 @@ export default function TimelineNavigation() {
           {sections.map((section, index) => {
             const isCompleted = completedSections.includes(section.storageKey);
             const isActive = pathname === section.path;
-            const isAccessible = index === 0 || completedSections.includes(sections[index - 1]?.storageKey);
+            // Allow navigation to any completed section or the next available section
+            const isAccessible = index === 0 || 
+                               completedSections.includes(sections[index - 1]?.storageKey) || 
+                               completedSections.includes(section.storageKey);
+            
+            // Special case for voltooid - only accessible if all sections are completed
+            const isVoltooidAccessible = section.id === 'voltooid' ? 
+              sections.slice(0, -1).every(s => completedSections.includes(s.storageKey)) : 
+              true;
             
 
             
@@ -67,8 +86,8 @@ export default function TimelineNavigation() {
               <div key={section.id} className="flex flex-col items-center">
                 {/* Timeline dot - Clickable */}
                 <button
-                  onClick={() => handleSectionClick(section.path)}
-                  disabled={!isAccessible}
+                  onClick={() => handleSectionClick(section.path, section.id)}
+                  disabled={!isAccessible || !isVoltooidAccessible}
                   className={`relative w-8 h-8 rounded-full border-2 mb-2 flex items-center justify-center transform -translate-y-0.5 transition-all duration-200 ${
                     isActive
                       ? 'bg-[#c7d316] border-[#c7d316] cursor-default'
@@ -92,8 +111,8 @@ export default function TimelineNavigation() {
                 
                 {/* Section button */}
                 <button
-                  onClick={() => handleSectionClick(section.path)}
-                  disabled={!isAccessible}
+                  onClick={() => handleSectionClick(section.path, section.id)}
+                  disabled={!isAccessible || !isVoltooidAccessible}
                   className={`px-2 py-1 rounded-md text-xs font-medium transition-colors duration-200 text-center max-w-20 whitespace-pre-line leading-tight ${
                     isActive
                       ? 'bg-[#c7d316] text-[#343234]'
