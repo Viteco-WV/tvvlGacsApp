@@ -93,15 +93,22 @@ export default function VerlichtingPage() {
   };
 
   const handleSave = () => {
+    // Sla antwoorden op
+    const allData = {
+      ...answers,
+      section: 'verlichting',
+      timestamp: new Date().toISOString()
+    };
+    
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.verlichting = answers;
+    parsedData.verlichting = allData;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
 
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/airconditioning');
+    router.push('/opnamen/zonwering');
   };
 
   const handlePrevious = () => {

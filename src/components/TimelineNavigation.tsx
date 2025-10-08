@@ -7,11 +7,11 @@ const sections = [
   { id: 'algemeen', name: 'Algemeen', path: '/opnamen/algemeen', storageKey: 'algemeen' },
   { id: 'verwarmingssysteem', name: 'Verwarming\nSysteem', path: '/opnamen/verwarmingssysteem', storageKey: 'verwarmingssysteem' },
   { id: 'warm-tapwater', name: 'Warm\nTapwater', path: '/opnamen/warm-tapwater', storageKey: 'warmTapwater' },
-  { id: 'ventilatie', name: 'Ventilatie', path: '/opnamen/ventilatie', storageKey: 'ventilatie' },
-  { id: 'verlichting', name: 'Verlichting', path: '/opnamen/verlichting', storageKey: 'verlichting' },
-  { id: 'airconditioning', name: 'Koeling\nSysteem', path: '/opnamen/airconditioning', storageKey: 'airconditioning' },
+  { id: 'airconditioning', name: 'Airconditioning\nSysteem', path: '/opnamen/airconditioning', storageKey: 'airconditioning' },
+  { id: 'ventilatie', name: 'Ventilatie\nSysteem', path: '/opnamen/ventilatie', storageKey: 'ventilatie' },
+  { id: 'verlichting', name: 'Verlichting\nSysteem', path: '/opnamen/verlichting', storageKey: 'verlichting' },
+  { id: 'zonwering', name: 'Zonwering\nSysteem', path: '/opnamen/zonwering', storageKey: 'zonwering' },
   { id: 'gebouwmanagement', name: 'Gebouw\nManagement', path: '/opnamen/gebouwmanagement', storageKey: 'gebouwmanagement' },
-  { id: 'zonwering', name: 'Zonwering', path: '/opnamen/zonwering', storageKey: 'zonwering' },
   { id: 'voltooid', name: 'Voltooid', path: '/opnamen/voltooid', storageKey: 'voltooid' }
 ];
 
@@ -43,19 +43,8 @@ export default function TimelineNavigation() {
     }
   }, [pathname]);
 
-  const handleSectionClick = (path: string, sectionId: string) => {
-    // Special handling for voltooid section
-    if (sectionId === 'voltooid') {
-      // Only allow navigation to voltooid if all other sections are completed
-      const allSectionsCompleted = sections.slice(0, -1).every(section => 
-        completedSections.includes(section.storageKey)
-      );
-      
-      if (!allSectionsCompleted) {
-        return;
-      }
-    }
-    
+  const handleSectionClick = (path: string) => {
+    // Always allow navigation to voltooid page
     router.push(path);
   };
 
@@ -75,10 +64,8 @@ export default function TimelineNavigation() {
                                completedSections.includes(sections[index - 1]?.storageKey) || 
                                completedSections.includes(section.storageKey);
             
-            // Special case for voltooid - only accessible if all sections are completed
-            const isVoltooidAccessible = section.id === 'voltooid' ? 
-              sections.slice(0, -1).every(s => completedSections.includes(s.storageKey)) : 
-              true;
+            // Voltooid is always accessible
+            const isVoltooidAccessible = true;
             
 
             
@@ -86,8 +73,8 @@ export default function TimelineNavigation() {
               <div key={section.id} className="flex flex-col items-center">
                 {/* Timeline dot - Clickable */}
                 <button
-                  onClick={() => handleSectionClick(section.path, section.id)}
-                  disabled={!isAccessible || !isVoltooidAccessible}
+                  onClick={() => handleSectionClick(section.path)}
+                  disabled={section.id === 'voltooid' ? false : (!isAccessible || !isVoltooidAccessible)}
                   className={`relative w-8 h-8 rounded-full border-2 mb-2 flex items-center justify-center transform -translate-y-0.5 transition-all duration-200 ${
                     isActive
                       ? 'bg-[#c7d316] border-[#c7d316] cursor-default'
@@ -111,9 +98,9 @@ export default function TimelineNavigation() {
                 
                 {/* Section button */}
                 <button
-                  onClick={() => handleSectionClick(section.path, section.id)}
-                  disabled={!isAccessible || !isVoltooidAccessible}
-                  className={`px-2 py-1 rounded-md text-xs font-medium transition-colors duration-200 text-center max-w-20 whitespace-pre-line leading-tight ${
+                  onClick={() => handleSectionClick(section.path)}
+                  disabled={section.id === 'voltooid' ? false : (!isAccessible || !isVoltooidAccessible)}
+                  className={`px-3 py-2 rounded-md text-xs font-medium transition-colors duration-200 text-center max-w-24 whitespace-pre-line leading-tight ${
                     isActive
                       ? 'bg-[#c7d316] text-[#343234]'
                       : isCompleted

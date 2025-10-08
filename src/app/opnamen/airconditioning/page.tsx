@@ -93,20 +93,27 @@ export default function AirconditioningPage() {
   };
 
   const handleSave = () => {
+    // Sla antwoorden op
+    const allData = {
+      ...answers,
+      section: 'airconditioning',
+      timestamp: new Date().toISOString()
+    };
+    
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.airconditioning = answers;
+    parsedData.airconditioning = allData;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
 
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/gebouwmanagement');
+    router.push('/opnamen/ventilatie');
   };
 
   const handlePrevious = () => {
     handleSave();
-    router.push('/opnamen/verlichting');
+    router.push('/opnamen/warm-tapwater');
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {

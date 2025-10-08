@@ -94,20 +94,27 @@ export default function ZonweringPage() {
   };
 
   const handleSave = () => {
+    // Sla antwoorden op
+    const allData = {
+      ...answers,
+      section: 'zonwering',
+      timestamp: new Date().toISOString()
+    };
+    
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.zonwering = answers;
+    parsedData.zonwering = allData;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
 
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/voltooid');
+    router.push('/opnamen/gebouwmanagement');
   };
 
   const handlePrevious = () => {
     handleSave();
-    router.push('/opnamen/gebouwmanagement');
+    router.push('/opnamen/verlichting');
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {

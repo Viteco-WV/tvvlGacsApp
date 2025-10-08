@@ -95,20 +95,27 @@ export default function GebouwmanagementPage() {
   };
 
   const handleSave = () => {
+    // Sla antwoorden op
+    const allData = {
+      ...answers,
+      section: 'gebouwmanagement',
+      timestamp: new Date().toISOString()
+    };
+    
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.gebouwmanagement = answers;
+    parsedData.gebouwmanagement = allData;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
 
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/zonwering');
+    router.push('/opnamen/voltooid');
   };
 
   const handlePrevious = () => {
     handleSave();
-    router.push('/opnamen/airconditioning');
+    router.push('/opnamen/zonwering');
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {

@@ -105,7 +105,7 @@ export default function WarmTapwaterPage() {
 
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/ventilatie');
+    router.push('/opnamen/airconditioning');
   };
 
   const handlePrevious = () => {

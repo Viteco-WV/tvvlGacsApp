@@ -92,9 +92,16 @@ export default function VentilatiePage() {
   };
 
   const handleSave = () => {
+    // Sla antwoorden op
+    const allData = {
+      ...answers,
+      section: 'ventilatie',
+      timestamp: new Date().toISOString()
+    };
+    
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.ventilatie = answers;
+    parsedData.ventilatie = allData;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
 
@@ -105,7 +112,7 @@ export default function VentilatiePage() {
 
   const handlePrevious = () => {
     handleSave();
-    router.push('/opnamen/warm-tapwater');
+    router.push('/opnamen/airconditioning');
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
