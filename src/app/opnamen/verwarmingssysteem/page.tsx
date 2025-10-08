@@ -20,40 +20,136 @@ export default function VerwarmingssysteemPage() {
 
   // Vragen voor verwarmingssysteem
   const questions = [
+    // Sectie 1: Warmteafgifte
     {
-      id: 'heating_type',
-      question: 'Welk type verwarmingssysteem is aanwezig?',
-      type: 'select',
-      options: ['CV-ketel', 'Warmtepomp', 'Stadsverwarming', 'Vloerverwarming', 'Radiatoren', 'Ander']
-    },
-    {
-      id: 'heating_control',
-      question: 'Is er een centrale regeling aanwezig?',
+      id: 'warmteafgifte_van_toepassing',
+      question: 'Vraag 1.1 - Van toepassing?',
       type: 'radio',
-      options: ['Ja', 'Nee']
+      options: ['Ja', 'Nee'],
+      section: '1 - Warmteafgifte'
     },
     {
-      id: 'heating_zones',
-      question: 'Hoeveel verwarmingszones zijn er?',
-      type: 'number',
-      min: 1,
-      max: 20
-    },
-    {
-      id: 'heating_efficiency',
-      question: 'Wat is de verwachte efficiëntie van het systeem?',
+      id: 'warmteafgifte_regeling',
+      question: 'Vraag 1.2 - Hoe wordt de warmteafgifte geregeld?',
       type: 'select',
-      options: ['< 70%', '70-80%', '80-90%', '> 90%', 'Onbekend']
+      options: [
+        'Geen automatische temperatuurregeling',
+        'Centrale automatische temperatuurregeling',
+        'Individuele temperatuurregeling per ruimte',
+        'Individuele temperatuurregeling per ruimte met communicatie naar centraal systeem',
+        'Individuele temperatuurregeling per ruimte met communicatie en aanwezigheidsdetectie'
+      ],
+      conditional: 'warmteafgifte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Warmteafgifte'
+    },
+    // Sectie 2: Thermisch geactiveerde gebouwstructuren
+    {
+      id: 'thermisch_geactiveerd_van_toepassing',
+      question: 'Vraag 2.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '2 - Thermisch geactiveerde gebouwstructuren'
     },
     {
-      id: 'heating_maintenance',
-      question: 'Wanneer was de laatste onderhoudsbeurt?',
-      type: 'date'
+      id: 'thermisch_geactiveerd_regeling',
+      question: 'Vraag 2.2 - Hoe is de warmteafgifte geregeld?',
+      type: 'select',
+      options: [
+        'Geen automatische temperatuurregeling',
+        'Centrale automatische temperatuurregeling',
+        'Geavanceerde centrale temperatuurregeling',
+        'Geavanceerde centrale temperatuurregeling met niet-continue gebruik en/of ruimtetemperatuur terugkoppeling'
+      ],
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Thermisch geactiveerde gebouwstructuren'
+    },
+    // Sectie 3: Regeling van watertemperatuur in distributienetwerk
+    {
+      id: 'watertemperatuur_van_toepassing',
+      question: 'Vraag 3.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '3 - Regeling van watertemperatuur in distributienetwerk'
     },
     {
-      id: 'heating_notes',
-      question: 'Aanvullende opmerkingen over het verwarmingssysteem:',
-      type: 'textarea'
+      id: 'watertemperatuur_regeling',
+      question: 'Vraag 3.2 - Hoe is de watertemperatuur geregeld?',
+      type: 'select',
+      options: [
+        'Geen automatische regeling',
+        'Buitentemperatuur-compensatie regeling',
+        'Vraag gestuurde regeling'
+      ],
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in distributienetwerk'
+    },
+    // Sectie 4: Regeling van distributiepompen
+    {
+      id: 'distributiepompen_van_toepassing',
+      question: 'Vraag 4.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '4 - Regeling van distributiepompen'
+    },
+    {
+      id: 'distributiepompen_regeling',
+      question: 'Vraag 4.2 - Hoe is de distributiepompen geregeld?',
+      type: 'select',
+      options: [
+        'Geen automatische regeling',
+        'Aan-uit regeling',
+        'Multi-fase / multi-stap regeling',
+        'Variabele snelheid regeling (intern of extern)'
+      ],
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
+    },
+    // Sectie 5: Aan-uit regeling van verwarmingsysteem
+    {
+      id: 'aan_uit_regeling_van_toepassing',
+      question: 'Vraag 5.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '5 - Aan-uit regeling van verwarmingsysteem'
+    },
+    {
+      id: 'aan_uit_regeling_status',
+      question: 'Vraag 5.2 - Hoe is de status van verwarming geregeld?',
+      type: 'select',
+      options: [
+        'Geen automatische regeling',
+        'Automatische regeling met timer',
+        'Automatische regeling met start-stop optimalisatie',
+        'Automatische vraag gestuurde regeling (intern/extern)'
+      ],
+      conditional: 'aan_uit_regeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Aan-uit regeling van verwarmingsysteem'
+    },
+    // Sectie 6: Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)
+    {
+      id: 'verwarmingstoestel_van_toepassing',
+      question: 'Vraag 6.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '6 - Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)'
+    },
+    {
+      id: 'verwarmingstoestel_regeling',
+      question: 'Vraag 6.2 - Hoe is de regeling van het verwarmingstoestel?',
+      type: 'select',
+      options: [
+        'Vaste temperatuurinstelling',
+        'Variable temperatuurinstelling gebaseerd op buitentemperatuur',
+        'Vraag gestuurde variable temperatuurinstelling'
+      ],
+      conditional: 'verwarmingstoestel_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)'
     }
   ];
 
@@ -107,6 +203,14 @@ export default function VerwarmingssysteemPage() {
 
   const renderQuestion = (question: Record<string, unknown>) => {
     const currentAnswer = (answers[question.id as string] as string) || '';
+
+    // Check if this is a conditional question
+    if (question.conditional) {
+      const conditionalAnswer = answers[question.conditional as string] as string;
+      if (conditionalAnswer !== question.conditionalValue) {
+        return null; // Don't render this question
+      }
+    }
 
     switch (question.type) {
       case 'select':
@@ -212,7 +316,11 @@ export default function VerwarmingssysteemPage() {
                 </h1>
               </div>
               <div className="bg-[#c7d316]/10 text-[#343234] px-3 py-1 rounded-full text-sm font-medium">
-                {questions.length} vragen
+                {Object.keys(questions.reduce((acc, question) => {
+                  const section = question.section || 'Overig';
+                  acc[section] = true;
+                  return acc;
+                }, {} as Record<string, boolean>)).length} secties
               </div>
             </div>
             
@@ -221,17 +329,43 @@ export default function VerwarmingssysteemPage() {
 
             {/* All Questions */}
             <div className="space-y-8">
-              {questions.map((question, index) => (
-                <div key={question.id as string} className="border-b border-gray-200 pb-6">
-                  <h3 className="text-lg font-semibold text-[#343234] mb-4">
-                    Vraag {index + 1}: {question.question}
-                  </h3>
-                  
-                  <div className="mb-4">
-                    {renderQuestion(question)}
+              {(() => {
+                // Group questions by section
+                const groupedQuestions = questions.reduce((acc, question) => {
+                  const section = question.section || 'Overig';
+                  if (!acc[section]) {
+                    acc[section] = [];
+                  }
+                  acc[section].push(question);
+                  return acc;
+                }, {} as Record<string, typeof questions>);
+
+                return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
+                  <div key={sectionName} className="border-b border-gray-200 pb-6">
+                    <h2 className="text-xl font-bold text-[#343234] mb-6">
+                      {sectionName}
+                    </h2>
+                    <div className="space-y-6">
+                      {sectionQuestions.map((question, index) => {
+                        const renderedQuestion = renderQuestion(question);
+                        if (!renderedQuestion) return null;
+                        
+                        return (
+                          <div key={question.id as string} className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-semibold text-[#343234] mb-4">
+                              {question.question}
+                            </h3>
+                            
+                            <div className="mb-4">
+                              {renderedQuestion}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
 
             {/* Navigation buttons */}
