@@ -19,52 +19,27 @@ export default function ZonweringPage() {
   const router = useRouter();
 
   const questions = [
+    // Sectie 1: Regeling zonwering
     {
-      id: 'zonwering_1',
-      question: 'Wat is het type zonwering in het gebouw?',
-      type: 'select',
-      options: ['Buitenzonwering', 'Binnenzonwering', 'Gecombineerd', 'Geen zonwering', 'Ander']
+      id: 'regeling_zonwering_van_toepassing',
+      question: 'Vraag 1.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '1 - Regeling zonwering'
     },
     {
-      id: 'zonwering_2',
-      question: 'Hoeveel zonweringselementen zijn er geïnstalleerd?',
-      type: 'number'
-    },
-    {
-      id: 'zonwering_3',
-      question: 'Is de zonwering automatisch geregeld?',
+      id: 'regeling_zonwering_type',
+      question: 'Vraag 1.2 - Hoe is de regeling zonwering?',
       type: 'select',
-      options: ['Ja', 'Nee', 'Gedeeltelijk']
-    },
-    {
-      id: 'zonwering_4',
-      question: 'Zijn er sensoren voor zonwering aanwezig?',
-      type: 'select',
-      options: ['Ja', 'Nee', 'Gedeeltelijk']
-    },
-    {
-      id: 'zonwering_5',
-      question: 'Wat is de leeftijd van de zonwering?',
-      type: 'select',
-      options: ['0-5 jaar', '6-10 jaar', '11-15 jaar', '16-20 jaar', '20+ jaar']
-    },
-    {
-      id: 'zonwering_6',
-      question: 'Is er een centraal regelsysteem voor zonwering?',
-      type: 'select',
-      options: ['Ja', 'Nee']
-    },
-    {
-      id: 'zonwering_7',
-      question: 'Zijn er handbedieningen aanwezig?',
-      type: 'select',
-      options: ['Ja', 'Nee', 'Gedeeltelijk']
-    },
-    {
-      id: 'zonwering_8',
-      question: 'Is er een onderhoudscontract voor de zonwering?',
-      type: 'select',
-      options: ['Ja', 'Nee']
+      options: [
+        'Handmatige bediening',
+        'Handmatige bediening met motor',
+        'Automatisch regeling met motor',
+        'Gecombineerde verlichting / zonwering / verwarming en koeling regeling'
+      ],
+      conditional: 'regeling_zonwering_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling zonwering'
     }
   ];
 
@@ -118,6 +93,14 @@ export default function ZonweringPage() {
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
+    // Check if this question should be shown based on conditional logic
+    if (question.conditional && question.conditionalValue) {
+      const conditionalAnswer = answers[question.conditional as string];
+      if (conditionalAnswer !== question.conditionalValue) {
+        return null; // Don't render this question
+      }
+    }
+
     const currentAnswer = (answers[question.id as string] as string) || '';
 
     switch (question.type) {
@@ -135,6 +118,25 @@ export default function ZonweringPage() {
               </option>
             ))}
           </select>
+        );
+
+      case 'radio':
+        return (
+          <div className="space-y-2">
+            {(question.options as string[])?.map((option: string) => (
+              <label key={option} className="flex items-center space-x-2 font-bold">
+                <input
+                  type="radio"
+                  name={question.id as string}
+                  value={option}
+                  checked={currentAnswer === option}
+                  onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+                  className="text-[#343234] focus:ring-green-500"
+                />
+                <span>{option}</span>
+              </label>
+            ))}
+          </div>
         );
 
       case 'number':
@@ -203,23 +205,54 @@ export default function ZonweringPage() {
                 </h1>
               </div>
               <div className="bg-[#c7d316]/10 text-[#343234] px-3 py-1 rounded-full text-sm font-medium">
-                {questions.length} vragen
+                {Object.keys(questions.reduce((acc, question) => {
+                  const section = question.section || 'Overig';
+                  acc[section] = true;
+                  return acc;
+                }, {} as Record<string, boolean>)).length} secties
               </div>
             </div>
             
             <div className="p-8">
+              {/* All Questions */}
               <div className="space-y-8">
-                {questions.map((question, index) => (
-                  <div key={question.id as string} className="border-b border-gray-200 pb-6">
-                    <h3 className="text-lg font-semibold text-[#343234] mb-4">
-                      Vraag {index + 1}: {question.question}
-                    </h3>
-                    
-                    <div className="mb-4">
-                      {renderQuestion(question)}
+                {(() => {
+                  // Group questions by section
+                  const groupedQuestions = questions.reduce((acc, question) => {
+                    const section = question.section || 'Overig';
+                    if (!acc[section]) {
+                      acc[section] = [];
+                    }
+                    acc[section].push(question);
+                    return acc;
+                  }, {} as Record<string, typeof questions>);
+
+                  return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
+                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                      <h2 className="text-xl font-bold text-[#343234] mb-6">
+                        {sectionName}
+                      </h2>
+                      <div className="space-y-6">
+                        {sectionQuestions.map((question, index) => {
+                          const renderedQuestion = renderQuestion(question);
+                          if (!renderedQuestion) return null;
+                          
+                          return (
+                            <div key={question.id as string} className="bg-gray-50 p-4 rounded-lg">
+                              <h3 className="text-lg font-semibold text-[#343234] mb-4">
+                                {question.question}
+                              </h3>
+                              
+                              <div className="mb-4">
+                                {renderedQuestion}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
               <div className="flex justify-center mt-8 pt-6 border-t border-gray-200 space-x-4">
                 <button

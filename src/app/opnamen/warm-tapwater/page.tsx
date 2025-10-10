@@ -20,47 +20,88 @@ export default function WarmTapwaterPage() {
 
   // Vragen voor warm tapwater
   const questions = [
+    // Sectie 1: Regeling van elektrische of warmtepomp boiler
     {
-      id: 'hot_water_type',
-      question: 'Welk type warm tapwater systeem is aanwezig?',
-      type: 'select',
-      options: ['Combi-ketel', 'Aparte boiler', 'Warmtepomp boiler', 'Zonneboiler', 'Stadsverwarming', 'Ander']
-    },
-    {
-      id: 'hot_water_capacity',
-      question: 'Wat is de capaciteit van het warm tapwater systeem?',
-      type: 'select',
-      options: ['< 100 liter', '100-200 liter', '200-500 liter', '500-1000 liter', '> 1000 liter', 'Onbekend']
-    },
-    {
-      id: 'hot_water_temperature',
-      question: 'Wat is de ingestelde temperatuur van het warm tapwater?',
-      type: 'number',
-      min: 40,
-      max: 90,
-      unit: '°C'
-    },
-    {
-      id: 'hot_water_circulation',
-      question: 'Is er een circulatiesysteem aanwezig?',
+      id: 'elektrische_boiler_van_toepassing',
+      question: 'Vraag 1.1 - Van toepassing?',
       type: 'radio',
-      options: ['Ja', 'Nee']
+      options: ['Ja', 'Nee'],
+      section: '1 - Regeling van elektrische of warmtepomp boiler'
     },
     {
-      id: 'hot_water_legionella',
-      question: 'Is er legionella preventie aanwezig?',
+      id: 'elektrische_boiler_regeling',
+      question: 'Vraag 1.2 - Hoe is de regeling van de elektrische of warmtepomp boiler?',
+      type: 'select',
+      options: [
+        'Automatische aan-uit regeling',
+        'Automatische aan-uit regeling met tijdgestuurde opwarming',
+        'Automatische aan-uit regeling met tijdgestuurde opwarming en multi-sensor regeling van warm wateropslag'
+      ],
+      conditional: 'elektrische_boiler_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling van elektrische of warmtepomp boiler'
+    },
+    // Sectie 2: Regeling van warmwater-opslag met externe warm wateropwekking
+    {
+      id: 'warmwater_opslag_van_toepassing',
+      question: 'Vraag 2.1 - Van toepassing?',
       type: 'radio',
-      options: ['Ja', 'Nee', 'Onbekend']
+      options: ['Ja', 'Nee'],
+      section: '2 - Regeling van warmwater-opslag met externe warm wateropwekking'
     },
     {
-      id: 'hot_water_maintenance',
-      question: 'Wanneer was de laatste onderhoudsbeurt?',
-      type: 'date'
+      id: 'warmwater_opslag_regeling',
+      question: 'Vraag 2.2 - Hoe is de regeling van de warmwater-opslag met externe warm wateropwekking?',
+      type: 'select',
+      options: [
+        'Automatische aan-uit regeling',
+        'Automatische aan-uit regeling met tijdgestuurde opwarming',
+        'Automatische aan-uit regeling met tijdgestuurde opwarming en vraag gestuurde multi-sensor regeling van warm wateropslag'
+      ],
+      conditional: 'warmwater_opslag_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Regeling van warmwater-opslag met externe warm wateropwekking'
+    },
+    // Sectie 3: Regeling van zonneboiler met back-up warmteopwekker
+    {
+      id: 'zonneboiler_van_toepassing',
+      question: 'Vraag 3.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '3 - Regeling van zonneboiler met back-up warmteopwekker'
     },
     {
-      id: 'hot_water_notes',
-      question: 'Aanvullende opmerkingen over het warm tapwater systeem:',
-      type: 'textarea'
+      id: 'zonneboiler_regeling',
+      question: 'Vraag 3.2 - Hoe is de regeling van de zonneboiler met back-up warmteopwekker?',
+      type: 'select',
+      options: [
+        'Handmatige regeling',
+        'Automatische regeling met zon-thermische opwekking (prioriteit 1) en additionele opwekking (prioriteit 2)',
+        'Automatische regeling met zon-thermische opwekking (prioriteit 1) en additionele opwekking (prioriteit 2) met vraag-gestuurde temperatuurregeling'
+      ],
+      conditional: 'zonneboiler_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van zonneboiler met back-up warmteopwekker'
+    },
+    // Sectie 4: Regeling van warm tapwater distributiepomp
+    {
+      id: 'distributiepomp_van_toepassing',
+      question: 'Vraag 4.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '4 - Regeling van warm tapwater distributiepomp'
+    },
+    {
+      id: 'distributiepomp_regeling',
+      question: 'Vraag 4.2 - Hoe is de regeling van de warm tapwater distributiepomp?',
+      type: 'select',
+      options: [
+        'Geen regeling (continue bedrijf)',
+        'Timer gestuurd'
+      ],
+      conditional: 'distributiepomp_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van warm tapwater distributiepomp'
     }
   ];
 
@@ -113,6 +154,14 @@ export default function WarmTapwaterPage() {
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
+    // Check if this question should be shown based on conditional logic
+    if (question.conditional && question.conditionalValue) {
+      const conditionalAnswer = answers[question.conditional as string];
+      if (conditionalAnswer !== question.conditionalValue) {
+        return null; // Don't render this question
+      }
+    }
+
     const currentAnswer = (answers[question.id as string] as string) || '';
 
     switch (question.type) {
@@ -222,7 +271,11 @@ export default function WarmTapwaterPage() {
                 </h1>
               </div>
               <div className="bg-[#c7d316]/10 text-[#343234] px-3 py-1 rounded-full text-sm font-medium">
-                {questions.length} vragen
+                {Object.keys(questions.reduce((acc, question) => {
+                  const section = question.section || 'Overig';
+                  acc[section] = true;
+                  return acc;
+                }, {} as Record<string, boolean>)).length} secties
               </div>
             </div>
             
@@ -230,17 +283,43 @@ export default function WarmTapwaterPage() {
             <div className="p-8">
               {/* All Questions */}
               <div className="space-y-8">
-                {questions.map((question, index) => (
-                  <div key={question.id as string} className="border-b border-gray-200 pb-6">
-                    <h3 className="text-lg font-semibold text-[#343234] mb-4">
-                      Vraag {index + 1}: {question.question}
-                    </h3>
-                    
-                    <div className="mb-4">
-                      {renderQuestion(question)}
+                {(() => {
+                  // Group questions by section
+                  const groupedQuestions = questions.reduce((acc, question) => {
+                    const section = question.section || 'Overig';
+                    if (!acc[section]) {
+                      acc[section] = [];
+                    }
+                    acc[section].push(question);
+                    return acc;
+                  }, {} as Record<string, typeof questions>);
+
+                  return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
+                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                      <h2 className="text-xl font-bold text-[#343234] mb-6">
+                        {sectionName}
+                      </h2>
+                      <div className="space-y-6">
+                        {sectionQuestions.map((question, index) => {
+                          const renderedQuestion = renderQuestion(question);
+                          if (!renderedQuestion) return null;
+                          
+                          return (
+                            <div key={question.id as string} className="bg-gray-50 p-4 rounded-lg">
+                              <h3 className="text-lg font-semibold text-[#343234] mb-4">
+                                {question.question}
+                              </h3>
+                              
+                              <div className="mb-4">
+                                {renderedQuestion}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
 
                           {/* Navigation buttons */}

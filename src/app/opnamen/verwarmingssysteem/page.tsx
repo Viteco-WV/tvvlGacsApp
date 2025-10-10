@@ -150,6 +150,91 @@ export default function VerwarmingssysteemPage() {
       conditional: 'verwarmingstoestel_van_toepassing',
       conditionalValue: 'Ja',
       section: '6 - Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)'
+    },
+    // Sectie 7: Regeling verwarmingstoestel (warmtepomp)
+    {
+      id: 'warmtepomp_van_toepassing',
+      question: 'Vraag 7.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '7 - Regeling verwarmingstoestel (warmtepomp)'
+    },
+    {
+      id: 'warmtepomp_regeling',
+      question: 'Vraag 7.2 - Hoe is de regeling van het verwarmingstoestel?',
+      type: 'select',
+      options: [
+        'Vaste temperatuurinstelling',
+        'Variable temperatuurinstelling gebaseerd op buitentemperatuur',
+        'Vraag gestuurde variable temperatuurinstelling'
+      ],
+      conditional: 'warmtepomp_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Regeling verwarmingstoestel (warmtepomp)'
+    },
+    // Sectie 8: Regeling verwarmingstoestel (buiten unit)
+    {
+      id: 'buiten_unit_van_toepassing',
+      question: 'Vraag 8.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '8 - Regeling verwarmingstoestel (buiten unit)'
+    },
+    {
+      id: 'buiten_unit_regeling',
+      question: 'Vraag 8.2 - Hoe is de regeling van het verwarmingstoestel?',
+      type: 'select',
+      options: [
+        'Aan-uit regeling',
+        'Multi-stappen regeling',
+        'Variabele regeling'
+      ],
+      conditional: 'buiten_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling verwarmingstoestel (buiten unit)'
+    },
+    // Sectie 9: Volgorde van warmte-opwekkers
+    {
+      id: 'warmte_opwekkers_van_toepassing',
+      question: 'Vraag 9.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '9 - Volgorde van warmte-opwekkers'
+    },
+    {
+      id: 'warmte_opwekkers_regeling',
+      question: 'Vraag 9.2 - Hoe is de regeling van het verwarmingstoestel?',
+      type: 'select',
+      options: [
+        'Vaste volgorde',
+        'Prioritering gebaseerd op belasting (warmtevraag)',
+        'Dynamische prioritering gebaseerd op efficiency en karakteristieken van de toestellen',
+        'Vraag gestuurde prioritering (gebaseerd op meerdere parameters)'
+      ],
+      conditional: 'warmte_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van warmte-opwekkers'
+    },
+    // Sectie 10: Warmteopslag
+    {
+      id: 'warmteopslag_van_toepassing',
+      question: 'Vraag 10.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '10 - Warmteopslag'
+    },
+    {
+      id: 'warmteopslag_regeling',
+      question: 'Vraag 10.2 - Hoe is de regeling van het verwarmingstoestel?',
+      type: 'select',
+      options: [
+        'Continue bedrijf',
+        'Twee-sensor gestuurde warmteopslag',
+        'Behoefte voorspellend warmteopslag'
+      ],
+      conditional: 'warmteopslag_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Warmteopslag'
     }
   ];
 

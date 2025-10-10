@@ -19,53 +19,152 @@ export default function GebouwmanagementPage() {
   const router = useRouter();
 
   const questions = [
+    // Sectie 1: Regeling setpoint
     {
-      id: 'gebouwmanagement_1',
-      question: 'Is er een gebouwbeheersysteem (BMS) aanwezig?',
-      type: 'select',
-      options: ['Ja', 'Nee', 'Gedeeltelijk']
+      id: 'setpoint_van_toepassing',
+      question: 'Vraag 1.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '1 - Regeling setpoint'
     },
     {
-      id: 'gebouwmanagement_2',
-      question: 'Welke systemen worden beheerd door het BMS?',
+      id: 'setpoint_regeling',
+      question: 'Vraag 1.2 - Hoe is de regeling setpoint?',
       type: 'select',
-      options: ['Verwarming', 'Ventilatie', 'Verlichting', 'Koeling', 'Alarm', 'Alle systemen', 'Geen BMS']
+      options: [
+        'Handmatige setpoint instelling per ruimte',
+        'Setpoint instelling alleen vanuit GEDECENTRALISEERDE technische ruimtes',
+        'Setpoint instelling vanuit een centraal punt',
+        'Setpoint instelling vanuit een centraal punt met regelmatige overschrijving van gebruikersinstellingen'
+      ],
+      conditional: 'setpoint_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling setpoint'
+    },
+    // Sectie 2: Runtime regeling
+    {
+      id: 'runtime_van_toepassing',
+      question: 'Vraag 2.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '2 - Runtime regeling'
     },
     {
-      id: 'gebouwmanagement_3',
-      question: 'Is er een centraal regelsysteem aanwezig?',
+      id: 'runtime_regeling',
+      question: 'Vraag 2.2 - Hoe is de runtime regeling?',
       type: 'select',
-      options: ['Ja', 'Nee']
+      options: [
+        'Handmatige instelling',
+        'Individuele tijdgestuurde regeling met vaste schakelpunten',
+        'Individuele tijdgestuurde regeling met variabele schakelpunten'
+      ],
+      conditional: 'runtime_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Runtime regeling'
+    },
+    // Sectie 3: Storingsdetectie en foutdiagnose
+    {
+      id: 'storingsdetectie_van_toepassing',
+      question: 'Vraag 3.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '3 - Storingsdetectie en foutdiagnose'
     },
     {
-      id: 'gebouwmanagement_4',
-      question: 'Zijn er sensoren geïnstalleerd voor monitoring?',
+      id: 'storingsdetectie_regeling',
+      question: 'Vraag 3.2 - Hoe is de storingsdetectie en foutdiagnose?',
       type: 'select',
-      options: ['Ja', 'Nee', 'Gedeeltelijk']
+      options: [
+        'Geen centrale detectie van storingen en alarmen',
+        'Centrale indicatie van storingen of alarmen',
+        'Centrale indicatie van fouten of alarmen met diagnostische functies'
+      ],
+      conditional: 'storingsdetectie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Storingsdetectie en foutdiagnose'
+    },
+    // Sectie 4: Energieconsumptie en binnenklimaat rapportage
+    {
+      id: 'energieconsumptie_van_toepassing',
+      question: 'Vraag 4.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '4 - Energieconsumptie en binnenklimaat rapportage'
     },
     {
-      id: 'gebouwmanagement_5',
-      question: 'Wat is de leeftijd van het gebouwbeheersysteem?',
+      id: 'energieconsumptie_regeling',
+      question: 'Vraag 4.2 - Hoe is de energieconsumptie en binnenklimaat rapportage?',
       type: 'select',
-      options: ['0-5 jaar', '6-10 jaar', '11-15 jaar', '16-20 jaar', '20+ jaar']
+      options: [
+        'Alleen indicatie van gemeten waarden (zoals temperatuur, meterstanden)',
+        'Rapportage van trends in gemeten waarden en energieconsumptie',
+        'Analyse van gemeten waarden, bepaling van energieprestatie en benchmarking'
+      ],
+      conditional: 'energieconsumptie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+    },
+    // Sectie 5: Lokale energieproductie en hernieuwbare energie
+    {
+      id: 'lokale_energie_van_toepassing',
+      question: 'Vraag 5.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '5 - Lokale energieproductie en hernieuwbare energie'
     },
     {
-      id: 'gebouwmanagement_6',
-      question: 'Is er een onderhoudscontract voor het BMS?',
+      id: 'lokale_energie_regeling',
+      question: 'Vraag 5.2 - Hoe is de lokale energieproductie en hernieuwbare energie?',
       type: 'select',
-      options: ['Ja', 'Nee']
+      options: [
+        'Geen (alle vormen van regeling van lokale energieproductie zijn toegestaan)',
+        'Ongereguleerde energieproductie, gebaseerd op de beschikbaarheid van de energiebron met teruglevering van energieoverschotten aan het net',
+        'Energie'
+      ],
+      conditional: 'lokale_energie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Lokale energieproductie en hernieuwbare energie'
+    },
+    // Sectie 6: Hergebruik restwarmte en verschuiving warmtevraag
+    {
+      id: 'restwarmte_van_toepassing',
+      question: 'Vraag 6.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
     },
     {
-      id: 'gebouwmanagement_7',
-      question: 'Zijn er alarmen geconfigureerd?',
+      id: 'restwarmte_regeling',
+      question: 'Vraag 6.2 - Hoe is het hergebruik restwarmte en verschuiving warmtevraag?',
       type: 'select',
-      options: ['Ja', 'Nee', 'Gedeeltelijk']
+      options: [
+        'Direct hergebruik van restwarmte of verschuiving warmtevraag',
+        'Gereguleerd gebruik van restwarmte en verschuiving warmtevraag (inclusief gebruik van thermische energieopslag)'
+      ],
+      conditional: 'restwarmte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+    },
+    // Sectie 7: Smart grid integratie
+    {
+      id: 'smart_grid_van_toepassing',
+      question: 'Vraag 7.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '7 - Smart grid integratie'
     },
     {
-      id: 'gebouwmanagement_8',
-      question: 'Is er een backup systeem voor het BMS?',
+      id: 'smart_grid_regeling',
+      question: 'Vraag 7.2 - Hoe is de smart grid integratie?',
       type: 'select',
-      options: ['Ja', 'Nee']
+      options: [
+        'Geen (alle vormen van smart grid integratie zijn toegestaan)',
+        'Geen coördinatie tussen energienetten (net) en gebouwsystemen',
+        'Coördinatie tussen energienetten (net) en gebouwsystemen met lastverschuiving'
+      ],
+      conditional: 'smart_grid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Smart grid integratie'
     }
   ];
 
@@ -119,6 +218,14 @@ export default function GebouwmanagementPage() {
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
+    // Check if this question should be shown based on conditional logic
+    if (question.conditional && question.conditionalValue) {
+      const conditionalAnswer = answers[question.conditional as string];
+      if (conditionalAnswer !== question.conditionalValue) {
+        return null; // Don't render this question
+      }
+    }
+
     const currentAnswer = (answers[question.id as string] as string) || '';
 
     switch (question.type) {
@@ -136,6 +243,25 @@ export default function GebouwmanagementPage() {
               </option>
             ))}
           </select>
+        );
+
+      case 'radio':
+        return (
+          <div className="space-y-2">
+            {(question.options as string[])?.map((option: string) => (
+              <label key={option} className="flex items-center space-x-2 font-bold">
+                <input
+                  type="radio"
+                  name={question.id as string}
+                  value={option}
+                  checked={currentAnswer === option}
+                  onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
+                  className="text-[#343234] focus:ring-green-500"
+                />
+                <span>{option}</span>
+              </label>
+            ))}
+          </div>
         );
 
       case 'number':
@@ -204,23 +330,54 @@ export default function GebouwmanagementPage() {
                 </h1>
               </div>
               <div className="bg-[#c7d316]/10 text-[#343234] px-3 py-1 rounded-full text-sm font-medium">
-                {questions.length} vragen
+                {Object.keys(questions.reduce((acc, question) => {
+                  const section = question.section || 'Overig';
+                  acc[section] = true;
+                  return acc;
+                }, {} as Record<string, boolean>)).length} secties
               </div>
             </div>
             
             <div className="p-8">
+              {/* All Questions */}
               <div className="space-y-8">
-                {questions.map((question, index) => (
-                  <div key={question.id as string} className="border-b border-gray-200 pb-6">
-                    <h3 className="text-lg font-semibold text-[#343234] mb-4">
-                      Vraag {index + 1}: {question.question}
-                    </h3>
-                    
-                    <div className="mb-4">
-                      {renderQuestion(question)}
+                {(() => {
+                  // Group questions by section
+                  const groupedQuestions = questions.reduce((acc, question) => {
+                    const section = question.section || 'Overig';
+                    if (!acc[section]) {
+                      acc[section] = [];
+                    }
+                    acc[section].push(question);
+                    return acc;
+                  }, {} as Record<string, typeof questions>);
+
+                  return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
+                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                      <h2 className="text-xl font-bold text-[#343234] mb-6">
+                        {sectionName}
+                      </h2>
+                      <div className="space-y-6">
+                        {sectionQuestions.map((question, index) => {
+                          const renderedQuestion = renderQuestion(question);
+                          if (!renderedQuestion) return null;
+                          
+                          return (
+                            <div key={question.id as string} className="bg-gray-50 p-4 rounded-lg">
+                              <h3 className="text-lg font-semibold text-[#343234] mb-4">
+                                {question.question}
+                              </h3>
+                              
+                              <div className="mb-4">
+                                {renderedQuestion}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
               <div className="flex justify-center mt-8 pt-6 border-t border-gray-200 space-x-4">
                 <button
