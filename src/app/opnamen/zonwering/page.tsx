@@ -40,6 +40,36 @@ export default function ZonweringPage() {
       conditional: 'regeling_zonwering_van_toepassing',
       conditionalValue: 'Ja',
       section: '1 - Regeling zonwering'
+    },
+    {
+      id: 'regeling_zonwering_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'regeling_zonwering_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling zonwering'
+    },
+    {
+      id: 'regeling_zonwering_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'regeling_zonwering_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling zonwering'
+    },
+
+        {
+      id: 'regeling_zonwering_verbetermaatregel',
+      question: 'Vraag 1.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'regeling_zonwering_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling zonwering'
     }
   ];
 
@@ -170,6 +200,36 @@ export default function ZonweringPage() {
           />
         );
 
+            case 'file':
+        return (
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    handleAnswerChange(question.id as string, event.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
+            />
+            {currentAnswer && (
+              <div className="mt-2">
+                <img 
+                  src={currentAnswer} 
+                  alt="Uploaded" 
+                  className="max-w-xs h-32 object-cover rounded-md border"
+                />
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return (
           <input
@@ -228,7 +288,7 @@ export default function ZonweringPage() {
                   }, {} as Record<string, typeof questions>);
 
                   return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
-                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                    <div key={sectionName} className="pb-6 border-b border-gray-200">
                       <h2 className="text-xl font-bold text-[#343234] mb-6">
                         {sectionName}
                       </h2>

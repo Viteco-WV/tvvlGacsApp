@@ -40,6 +40,35 @@ export default function VentilatiePage() {
       conditional: 'ventilatiestroom_van_toepassing',
       conditionalValue: 'Ja',
       section: '1 - Regeling van ventilatiestroom in de ruimte'
+    },    {
+      id: 'ventilatiestroom_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'ventilatiestroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
+    },
+    {
+      id: 'ventilatiestroom_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'ventilatiestroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
+    },
+
+    {
+      id: 'ventilatiestroom_verbetermaatregel',
+      question: 'Vraag 1.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'ventilatiestroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
     },
     // Sectie 2: Temperatuurregeling in de ruimte (luchtsystemen)
     {
@@ -61,6 +90,35 @@ export default function VentilatiePage() {
       conditional: 'temperatuur_lucht_van_toepassing',
       conditionalValue: 'Ja',
       section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
+    },    {
+      id: 'temperatuur_lucht_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'temperatuur_lucht_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
+    },
+    {
+      id: 'temperatuur_lucht_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'temperatuur_lucht_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
+    },
+
+    {
+      id: 'temperatuur_lucht_verbetermaatregel',
+      question: 'Vraag 2.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'temperatuur_lucht_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
     },
     // Sectie 3: Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)
     {
@@ -77,6 +135,35 @@ export default function VentilatiePage() {
       options: [
         'Geen afstemming',
         'Afstemming'
+      ],
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
+    },    {
+      id: 'temperatuur_gecombineerd_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
+    },
+    {
+      id: 'temperatuur_gecombineerd_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
+    },
+
+    {
+      id: 'temperatuur_gecombineerd_verbetermaatregel',
+      question: 'Vraag 3.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'temperatuur_gecombineerd_van_toepassing',
       conditionalValue: 'Ja',
@@ -103,6 +190,35 @@ export default function VentilatiePage() {
       conditional: 'buitenluchtstroom_van_toepassing',
       conditionalValue: 'Ja',
       section: '4 - Buitenluchtstroom regeling'
+    },    {
+      id: 'buitenluchtstroom_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'buitenluchtstroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Buitenluchtstroom regeling'
+    },
+    {
+      id: 'buitenluchtstroom_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'buitenluchtstroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Buitenluchtstroom regeling'
+    },
+
+    {
+      id: 'buitenluchtstroom_verbetermaatregel',
+      question: 'Vraag 4.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'buitenluchtstroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Buitenluchtstroom regeling'
     },
     // Sectie 5: Luchtstroom of luchtdrukregeling van air handeling unit
     {
@@ -121,6 +237,35 @@ export default function VentilatiePage() {
         'Tijd gestuurde aan-uit regeling',
         'Multi stap regeling',
         'Automatische luchtstroom of drukregeling (met of zonder reset)'
+      ],
+      conditional: 'luchtstroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
+    },    {
+      id: 'luchtstroom_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'luchtstroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
+    },
+    {
+      id: 'luchtstroom_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'luchtstroom_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
+    },
+
+    {
+      id: 'luchtstroom_verbetermaatregel',
+      question: 'Vraag 5.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'luchtstroom_van_toepassing',
       conditionalValue: 'Ja',
@@ -145,6 +290,35 @@ export default function VentilatiePage() {
       conditional: 'vorstbescherming_van_toepassing',
       conditionalValue: 'Ja',
       section: '6 - Warmte terugwinning: vorstbescherming'
+    },    {
+      id: 'vorstbescherming_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'vorstbescherming_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Warmte terugwinning: vorstbescherming'
+    },
+    {
+      id: 'vorstbescherming_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'vorstbescherming_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Warmte terugwinning: vorstbescherming'
+    },
+
+    {
+      id: 'vorstbescherming_verbetermaatregel',
+      question: 'Vraag 6.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'vorstbescherming_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Warmte terugwinning: vorstbescherming'
     },
     // Sectie 7: Warmte terugwinning: oververhitting bescherming
     {
@@ -161,6 +335,35 @@ export default function VentilatiePage() {
       options: [
         'Zonder oververhitting bescherming',
         'Met oververhitting bescherming'
+      ],
+      conditional: 'oververhitting_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
+    },    {
+      id: 'oververhitting_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'oververhitting_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
+    },
+    {
+      id: 'oververhitting_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'oververhitting_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
+    },
+
+    {
+      id: 'oververhitting_verbetermaatregel',
+      question: 'Vraag 7.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'oververhitting_van_toepassing',
       conditionalValue: 'Ja',
@@ -187,6 +390,35 @@ export default function VentilatiePage() {
       conditional: 'vrije_koeling_van_toepassing',
       conditionalValue: 'Ja',
       section: '8 - Vrije koeling'
+    },    {
+      id: 'vrije_koeling_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
+    },
+    {
+      id: 'vrije_koeling_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
+    },
+
+    {
+      id: 'vrije_koeling_verbetermaatregel',
+      question: 'Vraag 8.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
     },
     // Sectie 9: Regeling ventilatie temperatuur
     {
@@ -209,6 +441,35 @@ export default function VentilatiePage() {
       conditional: 'ventilatie_temperatuur_van_toepassing',
       conditionalValue: 'Ja',
       section: '9 - Regeling ventilatie temperatuur'
+    },    {
+      id: 'ventilatie_temperatuur_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
+    },
+    {
+      id: 'ventilatie_temperatuur_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
+    },
+
+    {
+      id: 'ventilatie_temperatuur_verbetermaatregel',
+      question: 'Vraag 9.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
     },
     // Sectie 10: Regeling luchtvochtigheid
     {
@@ -226,6 +487,36 @@ export default function VentilatiePage() {
         'Geen automatische controle',
         'Dauwpuntregeling',
         'Directe regeling luchtvochtigheid'
+      ],
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
+    },
+    {
+      id: 'luchtvochtigheid_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
+    },
+    {
+      id: 'luchtvochtigheid_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
+    },
+
+        {
+      id: 'luchtvochtigheid_verbetermaatregel',
+      question: 'Vraag 10.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'luchtvochtigheid_van_toepassing',
       conditionalValue: 'Ja',
@@ -360,6 +651,36 @@ export default function VentilatiePage() {
           />
         );
 
+            case 'file':
+        return (
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    handleAnswerChange(question.id as string, event.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
+            />
+            {currentAnswer && (
+              <div className="mt-2">
+                <img 
+                  src={currentAnswer} 
+                  alt="Uploaded" 
+                  className="max-w-xs h-32 object-cover rounded-md border"
+                />
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return (
           <input
@@ -418,7 +739,7 @@ export default function VentilatiePage() {
                   }, {} as Record<string, typeof questions>);
 
                   return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
-                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                    <div key={sectionName} className="pb-6 border-b border-gray-200">
                       <h2 className="text-xl font-bold text-[#343234] mb-6">
                         {sectionName}
                       </h2>

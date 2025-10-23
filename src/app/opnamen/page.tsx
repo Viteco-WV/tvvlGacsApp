@@ -25,6 +25,7 @@ interface AuditRecord {
 export default function OpnamenOverviewPage() {
   const [auditRecords, setAuditRecords] = useState<AuditRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -77,10 +78,21 @@ export default function OpnamenOverviewPage() {
   };
 
   const handleStartNewAudit = () => {
+    setShowModal(true);
+  };
+
+  const handleSelectChecklistType = (type: 'traditional' | 'advanced') => {
     // Wis alle bestaande data
     localStorage.removeItem('gacsBuildingData');
     localStorage.removeItem('gacsOpnamenData');
-    router.push('/opnamen/algemeen');
+    
+    if (type === 'traditional') {
+      router.push('/opnamen/algemeen');
+    } else {
+      router.push('/opnamen-geavanceerd/algemeen');
+    }
+    
+    setShowModal(false);
   };
 
   const handleContinueAudit = () => {
@@ -287,6 +299,55 @@ export default function OpnamenOverviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal voor checklist type selectie */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold text-[#343234] mb-6 text-center">
+              Kies Checklist Type
+            </h2>
+            <p className="text-gray-600 mb-8 text-center">
+              Selecteer het type checklist dat het beste past bij uw audit
+            </p>
+            
+            <div className="space-y-4">
+              <button
+                onClick={() => handleSelectChecklistType('traditional')}
+                className="w-full bg-[#c7d316] text-[#343234] px-6 py-4 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-bold text-left flex items-center justify-between"
+              >
+                <div>
+                  <div className="text-lg font-semibold">Traditionele Checklist</div>
+                  <div className="text-sm opacity-90">Standaard GACS audit proces</div>
+                </div>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              
+              <button
+                onClick={() => handleSelectChecklistType('advanced')}
+                className="w-full bg-blue-500 text-white px-6 py-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-bold text-left flex items-center justify-between"
+              >
+                <div>
+                  <div className="text-lg font-semibold">Checklist Geavanceerd</div>
+                  <div className="text-sm opacity-90">Uitgebreide analyse met extra functies</div>
+                </div>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            
+            <button
+              onClick={() => setShowModal(false)}
+              className="w-full mt-6 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+            >
+              Annuleren
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

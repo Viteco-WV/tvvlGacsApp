@@ -42,6 +42,35 @@ export default function VerwarmingssysteemPage() {
       conditional: 'warmteafgifte_van_toepassing',
       conditionalValue: 'Ja',
       section: '1 - Warmteafgifte'
+    },    {
+      id: 'warmteafgifte_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'warmteafgifte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Warmteafgifte'
+    },
+    {
+      id: 'warmteafgifte_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'warmteafgifte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Warmteafgifte'
+    },
+
+    {
+      id: 'warmteafgifte_verbetermaatregel',
+      question: 'Vraag 1.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'warmteafgifte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Warmteafgifte'
     },
     // Sectie 2: Thermisch geactiveerde gebouwstructuren
     {
@@ -64,6 +93,35 @@ export default function VerwarmingssysteemPage() {
       conditional: 'thermisch_geactiveerd_van_toepassing',
       conditionalValue: 'Ja',
       section: '2 - Thermisch geactiveerde gebouwstructuren'
+    },    {
+      id: 'thermisch_geactiveerd_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Thermisch geactiveerde gebouwstructuren'
+    },
+    {
+      id: 'thermisch_geactiveerd_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Thermisch geactiveerde gebouwstructuren'
+    },
+
+    {
+      id: 'thermisch_geactiveerd_verbetermaatregel',
+      question: 'Vraag 2.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Thermisch geactiveerde gebouwstructuren'
     },
     // Sectie 3: Regeling van watertemperatuur in distributienetwerk
     {
@@ -81,6 +139,35 @@ export default function VerwarmingssysteemPage() {
         'Geen automatische regeling',
         'Buitentemperatuur-compensatie regeling',
         'Vraag gestuurde regeling'
+      ],
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in distributienetwerk'
+    },    {
+      id: 'watertemperatuur_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in distributienetwerk'
+    },
+    {
+      id: 'watertemperatuur_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in distributienetwerk'
+    },
+
+    {
+      id: 'watertemperatuur_verbetermaatregel',
+      question: 'Vraag 3.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'watertemperatuur_van_toepassing',
       conditionalValue: 'Ja',
@@ -107,6 +194,35 @@ export default function VerwarmingssysteemPage() {
       conditional: 'distributiepompen_van_toepassing',
       conditionalValue: 'Ja',
       section: '4 - Regeling van distributiepompen'
+    },    {
+      id: 'distributiepompen_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
+    },
+    {
+      id: 'distributiepompen_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
+    },
+
+    {
+      id: 'distributiepompen_verbetermaatregel',
+      question: 'Vraag 4.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
     },
     // Sectie 5: Aan-uit regeling van verwarmingsysteem
     {
@@ -129,6 +245,35 @@ export default function VerwarmingssysteemPage() {
       conditional: 'aan_uit_regeling_van_toepassing',
       conditionalValue: 'Ja',
       section: '5 - Aan-uit regeling van verwarmingsysteem'
+    },    {
+      id: 'aan_uit_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'aan_uit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Aan-uit regeling van verwarmingsysteem'
+    },
+    {
+      id: 'aan_uit_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'aan_uit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Aan-uit regeling van verwarmingsysteem'
+    },
+
+    {
+      id: 'aan_uit_verbetermaatregel',
+      question: 'Vraag 5.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'aan_uit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Aan-uit regeling van verwarmingsysteem'
     },
     // Sectie 6: Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)
     {
@@ -146,6 +291,35 @@ export default function VerwarmingssysteemPage() {
         'Vaste temperatuurinstelling',
         'Variable temperatuurinstelling gebaseerd op buitentemperatuur',
         'Vraag gestuurde variable temperatuurinstelling'
+      ],
+      conditional: 'verwarmingstoestel_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)'
+    },    {
+      id: 'verwarmingstoestel_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'verwarmingstoestel_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)'
+    },
+    {
+      id: 'verwarmingstoestel_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'verwarmingstoestel_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Regeling verwarmingstoestel (verbrandingstoestellen en warmtelevering)'
+    },
+
+    {
+      id: 'verwarmingstoestel_verbetermaatregel',
+      question: 'Vraag 6.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'verwarmingstoestel_van_toepassing',
       conditionalValue: 'Ja',
@@ -171,6 +345,35 @@ export default function VerwarmingssysteemPage() {
       conditional: 'warmtepomp_van_toepassing',
       conditionalValue: 'Ja',
       section: '7 - Regeling verwarmingstoestel (warmtepomp)'
+    },    {
+      id: 'warmtepomp_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'warmtepomp_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Regeling verwarmingstoestel (warmtepomp)'
+    },
+    {
+      id: 'warmtepomp_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'warmtepomp_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Regeling verwarmingstoestel (warmtepomp)'
+    },
+
+    {
+      id: 'warmtepomp_verbetermaatregel',
+      question: 'Vraag 7.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'warmtepomp_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Regeling verwarmingstoestel (warmtepomp)'
     },
     // Sectie 8: Regeling verwarmingstoestel (buiten unit)
     {
@@ -188,6 +391,35 @@ export default function VerwarmingssysteemPage() {
         'Aan-uit regeling',
         'Multi-stappen regeling',
         'Variabele regeling'
+      ],
+      conditional: 'buiten_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling verwarmingstoestel (buiten unit)'
+    },    {
+      id: 'buiten_unit_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'buiten_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling verwarmingstoestel (buiten unit)'
+    },
+    {
+      id: 'buiten_unit_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'buiten_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling verwarmingstoestel (buiten unit)'
+    },
+
+    {
+      id: 'buiten_unit_verbetermaatregel',
+      question: 'Vraag 8.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'buiten_unit_van_toepassing',
       conditionalValue: 'Ja',
@@ -214,6 +446,35 @@ export default function VerwarmingssysteemPage() {
       conditional: 'warmte_opwekkers_van_toepassing',
       conditionalValue: 'Ja',
       section: '9 - Volgorde van warmte-opwekkers'
+    },    {
+      id: 'warmte_opwekkers_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'warmte_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van warmte-opwekkers'
+    },
+    {
+      id: 'warmte_opwekkers_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'warmte_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van warmte-opwekkers'
+    },
+
+    {
+      id: 'warmte_opwekkers_verbetermaatregel',
+      question: 'Vraag 9.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'warmte_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van warmte-opwekkers'
     },
     // Sectie 10: Warmteopslag
     {
@@ -231,6 +492,36 @@ export default function VerwarmingssysteemPage() {
         'Continue bedrijf',
         'Twee-sensor gestuurde warmteopslag',
         'Behoefte voorspellend warmteopslag'
+      ],
+      conditional: 'warmteopslag_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Warmteopslag'
+    },
+    {
+      id: 'warmteopslag_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'warmteopslag_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Warmteopslag'
+    },
+    {
+      id: 'warmteopslag_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'warmteopslag_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Warmteopslag'
+    },
+
+        {
+      id: 'warmteopslag_verbetermaatregel',
+      question: 'Vraag 10.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'warmteopslag_van_toepassing',
       conditionalValue: 'Ja',
@@ -265,21 +556,21 @@ export default function VerwarmingssysteemPage() {
 
   const handleSave = () => {
     // Sla antwoorden op
-    const allData = {
-      ...answers,
-      section: 'verwarmingssysteem',
-      timestamp: new Date().toISOString()
-    };
-    
-    const existingData = localStorage.getItem('gacsOpnamenData');
-    const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.verwarmingssysteem = allData;
-    localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      const allData = {
+        ...answers,
+        section: 'verwarmingssysteem',
+        timestamp: new Date().toISOString()
+      };
+      
+      const existingData = localStorage.getItem('gacsOpnamenData');
+      const parsedData = existingData ? JSON.parse(existingData) : {};
+      parsedData.verwarmingssysteem = allData;
+      localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
-
+      
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/warm-tapwater');
+      router.push('/opnamen/warm-tapwater');
   };
 
   const handlePrevious = () => {
@@ -364,6 +655,36 @@ export default function VerwarmingssysteemPage() {
           />
         );
 
+            case 'file':
+        return (
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    handleAnswerChange(question.id as string, event.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
+            />
+            {currentAnswer && (
+              <div className="mt-2">
+                <img 
+                  src={currentAnswer} 
+                  alt="Uploaded" 
+                  className="max-w-xs h-32 object-cover rounded-md border"
+                />
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return (
           <input
@@ -408,7 +729,7 @@ export default function VerwarmingssysteemPage() {
                 }, {} as Record<string, boolean>)).length} secties
               </div>
             </div>
-            
+
             {/* Content */}
             <div className="p-8">
 
@@ -426,7 +747,7 @@ export default function VerwarmingssysteemPage() {
                 }, {} as Record<string, typeof questions>);
 
                 return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
-                  <div key={sectionName} className="border-b border-gray-200 pb-6">
+                  <div key={sectionName} className="pb-6 border-b border-gray-200">
                     <h2 className="text-xl font-bold text-[#343234] mb-6">
                       {sectionName}
                     </h2>
@@ -439,8 +760,8 @@ export default function VerwarmingssysteemPage() {
                           <div key={question.id as string} className="bg-gray-50 p-4 rounded-lg">
                             <h3 className="text-lg font-semibold text-[#343234] mb-4">
                               {question.question}
-                            </h3>
-                            
+              </h3>
+              
                             <div className="mb-4">
                               {renderedQuestion}
                             </div>
@@ -448,7 +769,7 @@ export default function VerwarmingssysteemPage() {
                         );
                       })}
                     </div>
-                  </div>
+              </div>
                 ));
               })()}
             </div>

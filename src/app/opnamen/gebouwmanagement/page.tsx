@@ -40,6 +40,35 @@ export default function GebouwmanagementPage() {
       conditional: 'setpoint_van_toepassing',
       conditionalValue: 'Ja',
       section: '1 - Regeling setpoint'
+    },    {
+      id: 'setpoint_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'setpoint_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling setpoint'
+    },
+    {
+      id: 'setpoint_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'setpoint_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling setpoint'
+    },
+
+    {
+      id: 'setpoint_verbetermaatregel',
+      question: 'Vraag 1.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'setpoint_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling setpoint'
     },
     // Sectie 2: Runtime regeling
     {
@@ -57,6 +86,35 @@ export default function GebouwmanagementPage() {
         'Handmatige instelling',
         'Individuele tijdgestuurde regeling met vaste schakelpunten',
         'Individuele tijdgestuurde regeling met variabele schakelpunten'
+      ],
+      conditional: 'runtime_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Runtime regeling'
+    },    {
+      id: 'runtime_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'runtime_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Runtime regeling'
+    },
+    {
+      id: 'runtime_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'runtime_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Runtime regeling'
+    },
+
+    {
+      id: 'runtime_verbetermaatregel',
+      question: 'Vraag 2.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'runtime_van_toepassing',
       conditionalValue: 'Ja',
@@ -82,6 +140,35 @@ export default function GebouwmanagementPage() {
       conditional: 'storingsdetectie_van_toepassing',
       conditionalValue: 'Ja',
       section: '3 - Storingsdetectie en foutdiagnose'
+    },    {
+      id: 'storingsdetectie_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'storingsdetectie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Storingsdetectie en foutdiagnose'
+    },
+    {
+      id: 'storingsdetectie_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'storingsdetectie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Storingsdetectie en foutdiagnose'
+    },
+
+    {
+      id: 'storingsdetectie_verbetermaatregel',
+      question: 'Vraag 3.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'storingsdetectie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Storingsdetectie en foutdiagnose'
     },
     // Sectie 4: Energieconsumptie en binnenklimaat rapportage
     {
@@ -99,6 +186,35 @@ export default function GebouwmanagementPage() {
         'Alleen indicatie van gemeten waarden (zoals temperatuur, meterstanden)',
         'Rapportage van trends in gemeten waarden en energieconsumptie',
         'Analyse van gemeten waarden, bepaling van energieprestatie en benchmarking'
+      ],
+      conditional: 'energieconsumptie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+    },    {
+      id: 'energieconsumptie_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'energieconsumptie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+    },
+    {
+      id: 'energieconsumptie_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'energieconsumptie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+    },
+
+    {
+      id: 'energieconsumptie_verbetermaatregel',
+      question: 'Vraag 4.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'energieconsumptie_van_toepassing',
       conditionalValue: 'Ja',
@@ -124,6 +240,35 @@ export default function GebouwmanagementPage() {
       conditional: 'lokale_energie_van_toepassing',
       conditionalValue: 'Ja',
       section: '5 - Lokale energieproductie en hernieuwbare energie'
+    },    {
+      id: 'lokale_energie_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'lokale_energie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Lokale energieproductie en hernieuwbare energie'
+    },
+    {
+      id: 'lokale_energie_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'lokale_energie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Lokale energieproductie en hernieuwbare energie'
+    },
+
+    {
+      id: 'lokale_energie_verbetermaatregel',
+      question: 'Vraag 5.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'lokale_energie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Lokale energieproductie en hernieuwbare energie'
     },
     // Sectie 6: Hergebruik restwarmte en verschuiving warmtevraag
     {
@@ -140,6 +285,35 @@ export default function GebouwmanagementPage() {
       options: [
         'Direct hergebruik van restwarmte of verschuiving warmtevraag',
         'Gereguleerd gebruik van restwarmte en verschuiving warmtevraag (inclusief gebruik van thermische energieopslag)'
+      ],
+      conditional: 'restwarmte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+    },    {
+      id: 'restwarmte_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'restwarmte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+    },
+    {
+      id: 'restwarmte_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'restwarmte_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+    },
+
+    {
+      id: 'restwarmte_verbetermaatregel',
+      question: 'Vraag 6.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'restwarmte_van_toepassing',
       conditionalValue: 'Ja',
@@ -161,6 +335,36 @@ export default function GebouwmanagementPage() {
         'Geen (alle vormen van smart grid integratie zijn toegestaan)',
         'Geen coördinatie tussen energienetten (net) en gebouwsystemen',
         'Coördinatie tussen energienetten (net) en gebouwsystemen met lastverschuiving'
+      ],
+      conditional: 'smart_grid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Smart grid integratie'
+    },
+    {
+      id: 'smart_grid_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'smart_grid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Smart grid integratie'
+    },
+    {
+      id: 'smart_grid_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'smart_grid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Smart grid integratie'
+    },
+
+        {
+      id: 'smart_grid_verbetermaatregel',
+      question: 'Vraag 7.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'smart_grid_van_toepassing',
       conditionalValue: 'Ja',
@@ -295,6 +499,36 @@ export default function GebouwmanagementPage() {
           />
         );
 
+            case 'file':
+        return (
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    handleAnswerChange(question.id as string, event.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
+            />
+            {currentAnswer && (
+              <div className="mt-2">
+                <img 
+                  src={currentAnswer} 
+                  alt="Uploaded" 
+                  className="max-w-xs h-32 object-cover rounded-md border"
+                />
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return (
           <input
@@ -353,7 +587,7 @@ export default function GebouwmanagementPage() {
                   }, {} as Record<string, typeof questions>);
 
                   return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
-                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                    <div key={sectionName} className="pb-6 border-b border-gray-200">
                       <h2 className="text-xl font-bold text-[#343234] mb-6">
                         {sectionName}
                       </h2>

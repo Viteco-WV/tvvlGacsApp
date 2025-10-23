@@ -41,6 +41,35 @@ export default function AirconditioningPage() {
       conditional: 'afgifte_unit_van_toepassing',
       conditionalValue: 'Ja',
       section: '1 - Regeling afgifte-unit (koude-paneel, fancoil unit, binnen unit airco)'
+    },    {
+      id: 'afgifte_unit_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'afgifte_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling afgifte-unit (koude-paneel, fancoil unit, binnen unit airco)'
+    },
+    {
+      id: 'afgifte_unit_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'afgifte_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling afgifte-unit (koude-paneel, fancoil unit, binnen unit airco)'
+    },
+
+    {
+      id: 'afgifte_unit_verbetermaatregel',
+      question: 'Vraag 1.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'afgifte_unit_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '1 - Regeling afgifte-unit (koude-paneel, fancoil unit, binnen unit airco)'
     },
     // Sectie 2: Regeling afgifte-unit bij thermisch geactiveerde gebouw structuren
     {
@@ -59,6 +88,35 @@ export default function AirconditioningPage() {
         'Centrale automatische temperatuurregeling',
         'Geavanceerde centrale temperatuur regeling',
         'Geavanceerde centrale temperatuur regeling met niet continue gebruik en/of ruimtetemperatuur terugkoppeling'
+      ],
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Regeling afgifte-unit bij thermisch geactiveerde gebouw structuren'
+    },    {
+      id: 'thermisch_geactiveerd_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Regeling afgifte-unit bij thermisch geactiveerde gebouw structuren'
+    },
+    {
+      id: 'thermisch_geactiveerd_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'thermisch_geactiveerd_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '2 - Regeling afgifte-unit bij thermisch geactiveerde gebouw structuren'
+    },
+
+    {
+      id: 'thermisch_geactiveerd_verbetermaatregel',
+      question: 'Vraag 2.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'thermisch_geactiveerd_van_toepassing',
       conditionalValue: 'Ja',
@@ -84,6 +142,35 @@ export default function AirconditioningPage() {
       conditional: 'watertemperatuur_van_toepassing',
       conditionalValue: 'Ja',
       section: '3 - Regeling van watertemperatuur in het distributie netwerk (aanvoer of retour)'
+    },    {
+      id: 'watertemperatuur_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in het distributie netwerk (aanvoer of retour)'
+    },
+    {
+      id: 'watertemperatuur_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in het distributie netwerk (aanvoer of retour)'
+    },
+
+    {
+      id: 'watertemperatuur_verbetermaatregel',
+      question: 'Vraag 3.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'watertemperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '3 - Regeling van watertemperatuur in het distributie netwerk (aanvoer of retour)'
     },
     // Sectie 4: Regeling van distributiepompen
     {
@@ -102,6 +189,35 @@ export default function AirconditioningPage() {
         'Aan-uit regeling',
         'Multi-fase / multi-stap regeling',
         'Variabele snelheid regeling (inter/extern)'
+      ],
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
+    },    {
+      id: 'distributiepompen_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
+    },
+    {
+      id: 'distributiepompen_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'distributiepompen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '4 - Regeling van distributiepompen'
+    },
+
+    {
+      id: 'distributiepompen_verbetermaatregel',
+      question: 'Vraag 4.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'distributiepompen_van_toepassing',
       conditionalValue: 'Ja',
@@ -129,6 +245,35 @@ export default function AirconditioningPage() {
       conditional: 'koudedistributie_van_toepassing',
       conditionalValue: 'Ja',
       section: '5 - Hydraulisch gebalanceerd koudedistributie'
+    },    {
+      id: 'koudedistributie_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'koudedistributie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Hydraulisch gebalanceerd koudedistributie'
+    },
+    {
+      id: 'koudedistributie_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'koudedistributie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Hydraulisch gebalanceerd koudedistributie'
+    },
+
+    {
+      id: 'koudedistributie_verbetermaatregel',
+      question: 'Vraag 5.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'koudedistributie_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '5 - Hydraulisch gebalanceerd koudedistributie'
     },
     // Sectie 6: Aan-uit regeling van koelsystemen
     {
@@ -147,6 +292,35 @@ export default function AirconditioningPage() {
         'Automatische regeling met timer',
         'Automatische regeling met start-stop optimalisatie',
         'Automatische vraag gestuurde regeling'
+      ],
+      conditional: 'koelsystemen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Aan-uit regeling van koelsystemen'
+    },    {
+      id: 'koelsystemen_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'koelsystemen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Aan-uit regeling van koelsystemen'
+    },
+    {
+      id: 'koelsystemen_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'koelsystemen_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '6 - Aan-uit regeling van koelsystemen'
+    },
+
+    {
+      id: 'koelsystemen_verbetermaatregel',
+      question: 'Vraag 6.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'koelsystemen_van_toepassing',
       conditionalValue: 'Ja',
@@ -172,6 +346,35 @@ export default function AirconditioningPage() {
       conditional: 'interlock_van_toepassing',
       conditionalValue: 'Ja',
       section: '7 - Interlock tussen verwarming en koeling'
+    },    {
+      id: 'interlock_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'interlock_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Interlock tussen verwarming en koeling'
+    },
+    {
+      id: 'interlock_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'interlock_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Interlock tussen verwarming en koeling'
+    },
+
+    {
+      id: 'interlock_verbetermaatregel',
+      question: 'Vraag 7.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'interlock_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '7 - Interlock tussen verwarming en koeling'
     },
     // Sectie 8: Regeling van koude-opwekkers
     {
@@ -189,6 +392,35 @@ export default function AirconditioningPage() {
         'Vaste temperatuurinstelling',
         'Variabele temperatuurinstelling gebaseerd op buitentemperatuur',
         'Vraag-gestuurde variabele temperatuurinstelling'
+      ],
+      conditional: 'koude_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling van koude-opwekkers'
+    },    {
+      id: 'koude_opwekkers_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'koude_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling van koude-opwekkers'
+    },
+    {
+      id: 'koude_opwekkers_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'koude_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Regeling van koude-opwekkers'
+    },
+
+    {
+      id: 'koude_opwekkers_verbetermaatregel',
+      question: 'Vraag 8.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'koude_opwekkers_van_toepassing',
       conditionalValue: 'Ja',
@@ -211,6 +443,36 @@ export default function AirconditioningPage() {
         'Prioritering gebaseerd op belasting (koudevraag)',
         'Dynamische prioritering gebaseerd op efficiency en karakteristieken van de toestellen',
         'Vraag-gestuurde prioritering (gebaseerd op meerdere parameters)'
+      ],
+      conditional: 'volgorde_koude_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van koude-opwekkers'
+    },
+    {
+      id: 'volgorde_koude_opwekkers_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'volgorde_koude_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van koude-opwekkers'
+    },
+    {
+      id: 'volgorde_koude_opwekkers_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'volgorde_koude_opwekkers_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Volgorde van koude-opwekkers'
+    },
+
+        {
+      id: 'volgorde_koude_opwekkers_verbetermaatregel',
+      question: 'Vraag 9.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
       ],
       conditional: 'volgorde_koude_opwekkers_van_toepassing',
       conditionalValue: 'Ja',
@@ -245,26 +507,26 @@ export default function AirconditioningPage() {
 
   const handleSave = () => {
     // Sla antwoorden op
-    const allData = {
-      ...answers,
-      section: 'airconditioning',
-      timestamp: new Date().toISOString()
-    };
-    
-    const existingData = localStorage.getItem('gacsOpnamenData');
-    const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.airconditioning = allData;
-    localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      const allData = {
+        ...answers,
+        section: 'airconditioning',
+        timestamp: new Date().toISOString()
+      };
+      
+      const existingData = localStorage.getItem('gacsOpnamenData');
+      const parsedData = existingData ? JSON.parse(existingData) : {};
+      parsedData.airconditioning = allData;
+      localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
-
+      
   const handleNext = () => {
     handleSave();
-    router.push('/opnamen/ventilatie');
+      router.push('/opnamen/ventilatie');
   };
 
   const handlePrevious = () => {
     handleSave();
-    router.push('/opnamen/warm-tapwater');
+      router.push('/opnamen/warm-tapwater');
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
@@ -316,9 +578,9 @@ export default function AirconditioningPage() {
 
       case 'number':
         return (
-          <input
-            type="number"
-            value={currentAnswer}
+            <input
+              type="number"
+              value={currentAnswer}
             onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
@@ -343,6 +605,36 @@ export default function AirconditioningPage() {
             className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="Voer uw antwoord in..."
           />
+        );
+
+            case 'file':
+        return (
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    handleAnswerChange(question.id as string, event.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
+            />
+            {currentAnswer && (
+              <div className="mt-2">
+                <img 
+                  src={currentAnswer} 
+                  alt="Uploaded" 
+                  className="max-w-xs h-32 object-cover rounded-md border"
+                />
+              </div>
+            )}
+          </div>
         );
 
       default:
@@ -387,7 +679,7 @@ export default function AirconditioningPage() {
                 }, {} as Record<string, boolean>)).length} secties
               </div>
             </div>
-            
+
             <div className="p-8">
               {/* All Questions */}
               <div className="space-y-8">
@@ -403,7 +695,7 @@ export default function AirconditioningPage() {
                   }, {} as Record<string, typeof questions>);
 
                   return Object.entries(groupedQuestions).map(([sectionName, sectionQuestions]) => (
-                    <div key={sectionName} className="border-b border-gray-200 pb-6">
+                    <div key={sectionName} className="pb-6 border-b border-gray-200">
                       <h2 className="text-xl font-bold text-[#343234] mb-6">
                         {sectionName}
                       </h2>
@@ -416,8 +708,8 @@ export default function AirconditioningPage() {
                             <div key={question.id as string} className="bg-gray-50 p-4 rounded-lg">
                               <h3 className="text-lg font-semibold text-[#343234] mb-4">
                                 {question.question}
-                              </h3>
-                              
+              </h3>
+              
                               <div className="mb-4">
                                 {renderedQuestion}
                               </div>
@@ -430,25 +722,25 @@ export default function AirconditioningPage() {
                 })()}
               </div>
               <div className="flex justify-center mt-8 pt-6 border-t border-gray-200 space-x-4">
-                <button
-                  onClick={handlePrevious}
+              <button
+                onClick={handlePrevious}
                   className="px-6 py-3 bg-[#343234] text-white rounded-md hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2 font-bold"
-                >
+              >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   <span>Vorige onderdeel</span>
-                </button>
-                
-                <button
-                  onClick={handleNext}
+              </button>
+              
+              <button
+                onClick={handleNext}
                   className="px-6 py-3 bg-[#c7d314] text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2 font-bold"
-                >
+              >
                   <span>Volgende onderdeel</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </button>
+              </button>
               </div>
             </div>
           </div>
