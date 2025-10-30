@@ -135,16 +135,12 @@ export default function AlgemeenGeavanceerdPage() {
 
   const fetchEnergyLabel = async (postcode: string, houseNumber: string) => {
     if (!postcode || !houseNumber) {
-      console.log('Geen postcode of huisnummer opgegeven voor energielabel lookup');
       return;
     }
     
     setIsLoadingEnergyLabel(true);
     
     try {
-      console.log('Ophalen energielabel voor:', postcode, houseNumber);
-      
-      // EP-Online API call met timeout en betere error handling
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconden timeout
       
@@ -162,56 +158,29 @@ export default function AlgemeenGeavanceerdPage() {
       
       clearTimeout(timeoutId);
       
-      console.log('EP-Online API response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('EP-Online API response data:', data);
         
-        // Check if we have valid data
         if (data && (data.energielabel || data.length > 0)) {
           const labelData = Array.isArray(data) ? data[0] : data;
           setEnergyLabelData(labelData);
           
-          // Auto-fill energielabel als gevonden
           if (labelData.energielabel) {
             setBuildingData(prev => ({
               ...prev,
               energyLabel: labelData.energielabel
             }));
-            console.log('Energielabel succesvol opgehaald:', labelData.energielabel);
           }
         } else {
-          throw new Error('Geen energielabel data gevonden in response');
+          setEnergyLabelData(null);
         }
-      } else if (response.status === 404) {
-        console.warn('Geen energielabel gevonden voor dit adres (404)');
-        // Laat het veld leeg, geen mock data bij 404
-        setEnergyLabelData(null);
       } else {
-        console.warn(`EP-Online API error: ${response.status} ${response.statusText}`);
-        throw new Error(`API returned ${response.status}`);
+        setEnergyLabelData(null);
       }
     } catch (error) {
-      // Specifieke error handling op basis van error type
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          console.error('EP-Online API timeout - Request duurde te lang');
-        } else if (error.message.includes('Failed to fetch')) {
-          console.error('EP-Online API niet bereikbaar - Mogelijk CORS of netwerk probleem');
-        } else {
-          console.error('Error bij ophalen energielabel:', error.message);
-        }
-      } else {
-        console.error('Onbekende error bij ophalen energielabel:', error);
-      }
-      
-      // Geen automatische mock data - laat gebruiker handmatig invullen
-      console.log('Energielabel kan niet worden opgehaald - Gebruiker moet handmatig invoeren');
+      // Stilletjes afhandelen - geen errors tonen
+      // Gewoon null teruggeven zodat gebruiker handmatig kan invullen
       setEnergyLabelData(null);
-      
-      // Optioneel: laat een melding zien aan de gebruiker
-      // alert('Let op: Energielabel kon niet automatisch worden opgehaald. Vul deze handmatig in.');
     } finally {
       setIsLoadingEnergyLabel(false);
     }
@@ -225,8 +194,6 @@ export default function AlgemeenGeavanceerdPage() {
 
     setIsLoadingAddress(true);
     try {
-      console.log('Zoeken naar:', searchQuery);
-      
       try {
         const params = new URLSearchParams({
           q: searchQuery,
@@ -245,7 +212,7 @@ export default function AlgemeenGeavanceerdPage() {
        
         if (response.ok) {
           const data = await response.json();
-          console.log('BAG API response:', data);
+          // console.log('BAG API response:', data);
           
           if (data._embedded && data._embedded.adressen && data._embedded.adressen.length > 0) {
             const addresses = data._embedded.adressen;
@@ -272,11 +239,11 @@ export default function AlgemeenGeavanceerdPage() {
           }
         }
       } catch (apiError) {
-        console.log('BAG API niet beschikbaar, gebruik mock data:', apiError);
+        // console.log('BAG API niet beschikbaar, gebruik mock data:', apiError);
       }
       
       // Fallback naar mock data
-      console.log('Gebruik mock data voor testen');
+      // console.log('Gebruik mock data voor testen');
       const mockAddresses = [
         {
           openbareRuimteNaam: 'Korenmolenlaan',
@@ -329,7 +296,7 @@ export default function AlgemeenGeavanceerdPage() {
       setAddressResults(filteredAddresses);
       setShowAddressTable(true);
     } catch (error) {
-      console.error('Error searching addresses:', error);
+      // console.error('Error searching addresses:', error);
       alert('Er is een fout opgetreden bij het zoeken naar adressen.');
     } finally {
       setIsLoadingAddress(false);
@@ -344,7 +311,7 @@ export default function AlgemeenGeavanceerdPage() {
 
     setIsLoadingAddress(true);
     try {
-      console.log('Zoeken naar adressen voor:', buildingData.postcode, buildingData.houseNumber, buildingData.houseAddition);
+      // console.log('Zoeken naar adressen voor:', buildingData.postcode, buildingData.houseNumber, buildingData.houseAddition);
       
       // Probeer eerst BAG API, fallback naar mock data als het niet werkt
       try {
@@ -373,7 +340,7 @@ export default function AlgemeenGeavanceerdPage() {
        
         if (response.ok) {
           const data = await response.json();
-          console.log('BAG API response:', data);
+          // console.log('BAG API response:', data);
           
           if (data._embedded && data._embedded.adressen && data._embedded.adressen.length > 0) {
             const addresses = data._embedded.adressen;
@@ -396,11 +363,11 @@ export default function AlgemeenGeavanceerdPage() {
           }
         }
       } catch (apiError) {
-        console.log('BAG API niet beschikbaar, gebruik mock data:', apiError);
+        // console.log('BAG API niet beschikbaar, gebruik mock data:', apiError);
       }
       
       // Fallback naar mock data
-      console.log('Gebruik mock data voor testen');
+      // console.log('Gebruik mock data voor testen');
       const mockAddresses = [
         {
           openbareRuimteNaam: 'Korenmolenlaan',
@@ -463,7 +430,7 @@ export default function AlgemeenGeavanceerdPage() {
       setAddressResults(filteredAddresses);
       setShowAddressTable(true);
     } catch (error) {
-      console.error('Error fetching address:', error);
+      // console.error('Error fetching address:', error);
       alert('Er is een fout opgetreden bij het ophalen van het adres.');
     } finally {
       setIsLoadingAddress(false);
@@ -571,7 +538,7 @@ export default function AlgemeenGeavanceerdPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="flex-1 px-4 py-2 bg-white rounded-l-md focus:outline-none text-gray-800"
+                    className="flex-1 px-4 py-2 bg-white rounded-l-md focus:outline-none text-gray-900"
                   />
                   <button 
                     onClick={handleSearch}
@@ -648,7 +615,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="text"
                         value={buildingData.buildingName}
                         onChange={(e) => setBuildingData(prev => ({...prev, buildingName: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="Bedrijfspand"
                       />
                     </div>
@@ -662,7 +629,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="text"
                         value={buildingData.postcode}
                         onChange={(e) => setBuildingData(prev => ({...prev, postcode: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="1234 AB"
                       />
                     </div>
@@ -672,7 +639,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="text"
                         value={buildingData.houseNumber}
                         onChange={(e) => setBuildingData(prev => ({...prev, houseNumber: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="45"
                       />
                     </div>
@@ -682,7 +649,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="text"
                         value={buildingData.houseAddition}
                         onChange={(e) => setBuildingData(prev => ({...prev, houseAddition: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="A, b, II"
                       />
                     </div>
@@ -696,7 +663,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="text"
                         value={buildingData.address}
                         onChange={(e) => setBuildingData(prev => ({...prev, address: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="Korenmolenlaan 4"
                       />
                     </div>
@@ -709,7 +676,7 @@ export default function AlgemeenGeavanceerdPage() {
                       <select
                         value={buildingData.buildingType}
                         onChange={(e) => setBuildingData(prev => ({...prev, buildingType: e.target.value}))}
-                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                       >
                         <option value="">Selecteer toepassing</option>
                         <option value="kantoor">Kantoor</option>
@@ -728,7 +695,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="date"
                         value={buildingData.date}
                         onChange={(e) => setBuildingData(prev => ({...prev, date: e.target.value}))}
-                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                       />
                     </div>
                     <div>
@@ -736,7 +703,7 @@ export default function AlgemeenGeavanceerdPage() {
                       <select
                         value={buildingData.energyLabel}
                         onChange={(e) => setBuildingData(prev => ({...prev, energyLabel: e.target.value}))}
-                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                       >
                         <option value="">Selecteer energielabel</option>
                         <option value="A+++">A+++</option>
@@ -758,7 +725,7 @@ export default function AlgemeenGeavanceerdPage() {
                         type="number"
                         value={buildingData.buildingArea || ''}
                         onChange={(e) => setBuildingData(prev => ({...prev, buildingArea: e.target.value ? Number(e.target.value) : undefined}))}
-                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="m²"
                       />
                     </div>
@@ -782,7 +749,7 @@ export default function AlgemeenGeavanceerdPage() {
                         name="naam"
                         value={newContactPerson.naam}
                         onChange={handleContactPersonChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="Voornaam"
                       />
                     </div>
@@ -793,7 +760,7 @@ export default function AlgemeenGeavanceerdPage() {
                         name="achternaam"
                         value={newContactPerson.achternaam}
                         onChange={handleContactPersonChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="Achternaam"
                       />
                     </div>
@@ -804,7 +771,7 @@ export default function AlgemeenGeavanceerdPage() {
                         name="organisatie"
                         value={newContactPerson.organisatie}
                         onChange={handleContactPersonChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="Bedrijf/Organisatie"
                       />
                     </div>
@@ -815,7 +782,7 @@ export default function AlgemeenGeavanceerdPage() {
                         name="rol"
                         value={newContactPerson.rol}
                         onChange={handleContactPersonChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="Functie/Rol"
                       />
                     </div>
@@ -826,7 +793,7 @@ export default function AlgemeenGeavanceerdPage() {
                         name="email"
                         value={newContactPerson.email}
                         onChange={handleContactPersonChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="email@voorbeeld.nl"
                       />
                     </div>
@@ -837,7 +804,7 @@ export default function AlgemeenGeavanceerdPage() {
                         name="telefoon"
                         value={newContactPerson.telefoon}
                         onChange={handleContactPersonChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                         placeholder="06-12345678"
                       />
                     </div>

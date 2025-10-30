@@ -11,6 +11,7 @@ interface RoomTypeComponents {
     radiatorsConvectors: boolean;
     ventilatorConvectorFCU: boolean;
     floorCeiling: boolean;
+    floorWallSystem: boolean;
     fullAirAllAir: boolean;
     inductionUnit: boolean;
     concreteActivation: boolean;
@@ -19,6 +20,7 @@ interface RoomTypeComponents {
     none: boolean;
     ventilatorConvectorFCU: boolean;
     floorCeiling: boolean;
+    floorWallSystem: boolean;
     fullAirAllAir: boolean;
     inductionUnit: boolean;
     concreteActivation: boolean;
@@ -51,11 +53,21 @@ interface RoomTypeComponents {
   };
 }
 
+interface UploadedFile {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  preview: string;
+  data: string;
+}
+
 interface SavedRoomType {
   id: string;
   name: string;
   count: number;
   components: RoomTypeComponents;
+  files: UploadedFile[];
   timestamp: string;
 }
 
@@ -64,20 +76,23 @@ export default function RuimtetypesPage() {
   const [roomTypeName, setRoomTypeName] = useState('');
   const [roomTypeCount, setRoomTypeCount] = useState<number>(1);
   const [savedRoomTypes, setSavedRoomTypes] = useState<SavedRoomType[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [components, setComponents] = useState<RoomTypeComponents>({
     heating: {
       none: false,
       radiatorsConvectors: false,
-      ventilatorConvectorFCU: true,
-      floorCeiling: true,
+      ventilatorConvectorFCU: false,
+      floorCeiling: false,
+      floorWallSystem: false,
       fullAirAllAir: false,
       inductionUnit: false,
       concreteActivation: false,
     },
     cooling: {
       none: false,
-      ventilatorConvectorFCU: true,
-      floorCeiling: true,
+      ventilatorConvectorFCU: false,
+      floorCeiling: false,
+      floorWallSystem: false,
       fullAirAllAir: false,
       inductionUnit: false,
       concreteActivation: false,
@@ -93,44 +108,97 @@ export default function RuimtetypesPage() {
         sensorOnly: false,
         knobSwitchNoDisplay: false,
         operatingUnitSimple: false,
-        operatingUnitExtended: true,
+        operatingUnitExtended: false,
       },
       ceilingOrAbove: {
         knobCoveredMotor: false,
-        movementSensorSingle: true,
+        movementSensorSingle: false,
         movementSensorEnkel: false,
         lightIntensityArmature: false,
-        multiSensor: true,
+        multiSensor: false,
       },
       room: {
-        outdoorBlindHand: true,
+        outdoorBlindHand: false,
         outdoorBlindDisplay: false,
         roomContact: false,
       },
     },
   });
 
-  const handleToggle = (category: 'heating' | 'cooling', key: keyof RoomTypeComponents['heating'] | keyof RoomTypeComponents['cooling']) => {
-    setComponents(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: !prev[category][key as keyof typeof prev[typeof category]],
-      },
-    }));
+  const handleToggle = (category: 'heating' | 'cooling', key: string) => {
+    setComponents(prev => {
+      const categoryData = prev[category];
+      return {
+        ...prev,
+        [category]: {
+          ...categoryData,
+          [key]: !(categoryData as Record<string, boolean>)[key],
+        },
+      };
+    });
   };
 
   const handleControlToggle = (section: keyof RoomTypeComponents['controls'], key: string) => {
-    setComponents(prev => ({
-      ...prev,
-      controls: {
-        ...prev.controls,
-        [section]: {
-          ...prev.controls[section],
-          [key]: !prev.controls[section][key as keyof typeof prev.controls[typeof section]],
+    setComponents(prev => {
+      const sectionData = prev.controls[section];
+      return {
+        ...prev,
+        controls: {
+          ...prev.controls,
+          [section]: {
+            ...sectionData,
+            [key]: !(sectionData as Record<string, boolean>)[key],
+          },
         },
-      },
-    }));
+      };
+    });
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    // Check if adding these files would exceed the limit
+    if (uploadedFiles.length + files.length > 8) {
+      alert('Je kunt maximaal 8 bestanden uploaden');
+      return;
+    }
+
+    Array.from(files).forEach(file => {
+      // Validate file type
+      const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name}: Alleen PDF, PNG en JPG bestanden zijn toegestaan`);
+        return;
+      }
+
+      // Validate file size (2MB = 2 * 1024 * 1024 bytes)
+      if (file.size > 2 * 1024 * 1024) {
+        alert(`${file.name}: Bestand is te groot. Maximum grootte is 2MB`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const fileData: UploadedFile = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          preview: event.target?.result as string,
+          data: event.target?.result as string,
+        };
+        setUploadedFiles(prev => [...prev, fileData]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    e.target.value = '';
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
   };
 
   const handleSave = () => {
@@ -149,6 +217,7 @@ export default function RuimtetypesPage() {
       name: roomTypeName,
       count: roomTypeCount,
       components: { ...components },
+      files: [...uploadedFiles],
       timestamp: new Date().toLocaleString('nl-NL'),
     };
 
@@ -157,12 +226,14 @@ export default function RuimtetypesPage() {
     // Reset form
     setRoomTypeName('');
     setRoomTypeCount(1);
+    setUploadedFiles([]);
     setComponents({
       heating: {
         none: false,
         radiatorsConvectors: false,
         ventilatorConvectorFCU: false,
         floorCeiling: false,
+        floorWallSystem: false,
         fullAirAllAir: false,
         inductionUnit: false,
         concreteActivation: false,
@@ -171,6 +242,7 @@ export default function RuimtetypesPage() {
         none: false,
         ventilatorConvectorFCU: false,
         floorCeiling: false,
+        floorWallSystem: false,
         fullAirAllAir: false,
         inductionUnit: false,
         concreteActivation: false,
@@ -214,7 +286,8 @@ export default function RuimtetypesPage() {
       radiatorsConvectors: 'Radiatoren/Convectoren',
       ventilatorConvectorFCU: 'FCU',
       floorCeiling: 'Klimaatplafond',
-      fullAirAllAir: 'Vloer/Wand',
+      floorWallSystem: 'Vloer/Wand',
+      fullAirAllAir: 'Volledig lucht (all-air)',
       inductionUnit: 'Inductie-unit',
       concreteActivation: 'Beton Kern',
     };
@@ -326,7 +399,7 @@ export default function RuimtetypesPage() {
                   value={roomTypeName}
                   onChange={(e) => setRoomTypeName(e.target.value)}
                   placeholder="Geef een naam voor deze ruimte template"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                 />
               </div>
               <div>
@@ -338,7 +411,7 @@ export default function RuimtetypesPage() {
                   min="1"
                   value={roomTypeCount}
                   onChange={(e) => setRoomTypeCount(parseInt(e.target.value) || 1)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] bg-white text-gray-900"
                 />
               </div>
             </div>
@@ -380,13 +453,13 @@ export default function RuimtetypesPage() {
                   />
                   <ToggleSwitch
                     label="Vloer- of Wandsysteem"
-                    checked={components.heating.fullAirAllAir}
-                    onChange={() => handleToggle('heating', 'fullAirAllAir')}
+                    checked={components.heating.floorWallSystem}
+                    onChange={() => handleToggle('heating', 'floorWallSystem')}
                   />
                   <ToggleSwitch
                     label="Volledig lucht (all-air)"
-                    checked={components.heating.inductionUnit}
-                    onChange={() => handleToggle('heating', 'inductionUnit')}
+                    checked={components.heating.fullAirAllAir}
+                    onChange={() => handleToggle('heating', 'fullAirAllAir')}
                   />
                   <ToggleSwitch
                     label="Inductie-unit"
@@ -422,13 +495,13 @@ export default function RuimtetypesPage() {
                   />
                   <ToggleSwitch
                     label="Vloer- of Wandsysteem"
-                    checked={components.cooling.fullAirAllAir}
-                    onChange={() => handleToggle('cooling', 'fullAirAllAir')}
+                    checked={components.cooling.floorWallSystem}
+                    onChange={() => handleToggle('cooling', 'floorWallSystem')}
                   />
                   <ToggleSwitch
                     label="Volledig lucht (all-air)"
-                    checked={components.cooling.inductionUnit}
-                    onChange={() => handleToggle('cooling', 'inductionUnit')}
+                    checked={components.cooling.fullAirAllAir}
+                    onChange={() => handleToggle('cooling', 'fullAirAllAir')}
                   />
                   <ToggleSwitch
                     label="Inductie-unit"
@@ -563,16 +636,96 @@ export default function RuimtetypesPage() {
                 </div>
               </div>
             </div>
-            
-            {/* Save Button */}
-            <div className="flex justify-center mt-6">
-              <button
-                onClick={handleSave}
-                className="px-8 py-3 bg-[#c7d316] text-[#343234] rounded-md hover:bg-[#b3c014] transition-colors duration-200 font-medium"
-              >
-                Opslaan
-              </button>
+          </div>
+
+          {/* File Upload Section */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-[#343234] mb-2">
+              Bestanden / Foto&apos;s uploaden
+            </h2>
+            <p className="text-sm text-gray-600 italic mb-4">
+              Upload foto&apos;s of documenten van de ruimte. Maximaal 8 bestanden (PDF, PNG, JPG) van max 2MB per bestand.
+            </p>
+
+            <div className="bg-gray-50 rounded-lg p-6">
+              {/* Upload Button */}
+              <div className="mb-4">
+                <label className="flex items-center justify-center w-full px-4 py-3 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#c7d316] hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span className="text-sm text-gray-600 font-medium">
+                      Klik om bestanden te uploaden ({uploadedFiles.length}/8)
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={uploadedFiles.length >= 8}
+                  />
+                </label>
+              </div>
+
+              {/* File Previews */}
+              {uploadedFiles.length > 0 && (
+                <div className="grid grid-cols-4 gap-4">
+                  {uploadedFiles.map((file) => (
+                    <div key={file.id} className="relative bg-white rounded-lg p-2 border border-gray-200 shadow-sm group">
+                      {/* Preview */}
+                      <div className="aspect-square rounded overflow-hidden bg-gray-100 mb-2 flex items-center justify-center">
+                        {file.type === 'application/pdf' ? (
+                          <div className="flex flex-col items-center justify-center text-red-500">
+                            <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs mt-1">PDF</span>
+                          </div>
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={file.preview}
+                            alt={file.name}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      
+                      {/* File Info */}
+                      <div className="text-xs text-gray-600 truncate" title={file.name}>
+                        {file.name}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {(file.size / 1024).toFixed(1)} KB
+                      </div>
+
+                      {/* Remove Button */}
+                      <button
+                        onClick={() => handleRemoveFile(file.id)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-center mb-8">
+            <button
+              onClick={handleSave}
+              className="px-8 py-3 bg-[#c7d316] text-[#343234] rounded-md hover:bg-[#b3c014] transition-colors duration-200 font-medium"
+            >
+              Opslaan
+            </button>
           </div>
 
           {/* Saved Room Types Table */}
@@ -602,6 +755,9 @@ export default function RuimtetypesPage() {
                         Bediening
                       </th>
                       <th className="border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                        Bestanden
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-700">
                         Actie
                       </th>
                     </tr>
@@ -628,6 +784,16 @@ export default function RuimtetypesPage() {
                           </td>
                           <td className="border border-gray-300 px-4 py-3 text-sm text-gray-600">
                             {controlsText}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-3 text-center">
+                            <div className="flex items-center justify-center space-x-1">
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                              </svg>
+                              <span className="text-sm font-medium text-gray-700">
+                                {roomType.files.length}
+                              </span>
+                            </div>
                           </td>
                           <td className="border border-gray-300 px-4 py-3 text-center">
                             <button

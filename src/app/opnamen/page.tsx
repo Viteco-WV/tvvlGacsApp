@@ -156,14 +156,19 @@ export default function OpnamenOverviewPage() {
       {/* Header van home page */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="/TVVL-logo-los.png" 
-                alt="TVVL Logo" 
-                className="h-8 w-auto"
-              />
-              <span className="text-xl font-bold text-gray-800">GACS Platform</span>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div 
+                className="flex items-center space-x-3 cursor-pointer"
+                onClick={() => router.push('/')}
+              >
+                <img 
+                  src="/TVVL-logo-los.png" 
+                  alt="TVVL Logo" 
+                  className="h-8 w-auto"
+                />
+                <span className="text-xl font-bold text-gray-800">GACS Platform</span>
+              </div>
             </div>
           </div>
         </div>
@@ -176,7 +181,7 @@ export default function OpnamenOverviewPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-[#343234] mb-2">
-                  GACS Audit Overzicht
+                  GACS-audit overzicht
                 </h1>
                 <p className="text-gray-600">
                   Beheer al je gebouw audits en start nieuwe opnamen
@@ -189,7 +194,7 @@ export default function OpnamenOverviewPage() {
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Nieuwe Audit Starten
+                Nieuwe audit starten
               </button>
             </div>
           </div>
@@ -212,7 +217,7 @@ export default function OpnamenOverviewPage() {
                 onClick={handleStartNewAudit}
                 className="bg-[#c7d316] text-[#343234] px-6 py-3 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-bold"
               >
-                Eerste Audit Starten
+                Eerste audit starten
               </button>
             </div>
           ) : (
