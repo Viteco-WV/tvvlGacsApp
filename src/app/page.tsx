@@ -1,19 +1,43 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Droplets, Snowflake, Wind, Lightbulb, Sun, Building2, Flame } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const handleStartOpnamen = () => {
     router.push('/opnamen');
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Toon header bij omhoog scrollen, verberg bij omlaag scrollen
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        setShowHeader(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setShowHeader(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [lastScrollY]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className={`sticky top-0 z-50 bg-white shadow-sm border-b transition-transform duration-300 ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="container mx-auto px-4 py-4 max-w-7xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -25,7 +49,7 @@ export default function Home() {
               <span className="text-xl font-bold text-gray-800">GACS Platform</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#waarom" className="text-gray-600 hover:text-[#7BA800] font-medium">Waarom deze tool</a>
+              <a href="#whitepapers" className="text-gray-600 hover:text-[#7BA800] font-medium">Whitepapers</a>
               <a href="#voorbeelden" className="text-gray-600 hover:text-[#7BA800] font-medium">Voorbeelden</a>
               <a href="#contact" className="text-gray-600 hover:text-[#7BA800] font-medium">Doorontwikkeling</a>
             </nav>
@@ -124,7 +148,7 @@ export default function Home() {
                 <div className="text-center">
                 <div className="mb-4">
                   <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                     </div>
                 <h3 className="text-lg font-bold mb-2">Onafhankelijk</h3>
@@ -399,8 +423,8 @@ export default function Home() {
             <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
               <div className="h-48 bg-gray-300 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop" 
-                  alt="Kantoorgebouw Intechnium"
+                  src="/kantoorgebouw.jpeg" 
+                  alt="Kantoorgebouw"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -415,7 +439,7 @@ export default function Home() {
             <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
               <div className="h-48 bg-gray-300 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop" 
+                  src="/distributiecentra.avif" 
                   alt="Distributiecentra"
                   className="w-full h-full object-cover"
                 />
@@ -431,7 +455,7 @@ export default function Home() {
             <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
               <div className="h-48 bg-gray-300 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop" 
+                  src="/zorgcomplex.jpg" 
                   alt="Zorgcomplex"
                   className="w-full h-full object-cover"
                 />
@@ -447,7 +471,7 @@ export default function Home() {
             <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
               <div className="h-48 bg-gray-300 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop" 
+                  src="/zwembad.avif" 
                   alt="Zwembad"
                   className="w-full h-full object-cover"
                 />
@@ -470,22 +494,8 @@ export default function Home() {
             Heeft u vragen over de GACS tool? Neem gerust contact met ons op. Bij ideeën voor doorontwikkeling horen wij het graag!
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Linker kolom: Informatie */}
-            <div className="bg-gray-50 rounded-lg p-8">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Toekomstige uitbreidingen</h3>
-              <p className="text-gray-700 mb-4">
-                De GACS tool wordt continu doorontwikkeld op basis van feedback uit de markt en nieuwe inzichten uit de normcommissies. Toekomstige uitbreidingen zijn onder andere:
-              </p>
-              <ul className="list-disc ml-6 text-gray-700 space-y-2">
-                <li>Automatische PDF-rapportage en export</li>
-                <li>Koppeling met gebouwbeheersystemen (BMS)</li>
-                <li>Uitbreiding met extra modules en maatwerkvragen</li>
-                <li>Meer praktijkvoorbeelden en best practices</li>
-              </ul>
-            </div>
-
-            {/* Rechter kolom: Contactformulier */}
+          {/* Contactformulier - gecentreerd en breder */}
+          <div className="max-w-3xl mx-auto">
             <div className="bg-gray-50 rounded-lg p-8">
               <h3 className="text-xl font-bold text-gray-800 mb-4">Neem contact op</h3>
               <form className="space-y-4">
@@ -497,7 +507,7 @@ export default function Home() {
                     type="text"
                     id="name"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900 bg-white"
                   />
                 </div>
 
@@ -509,7 +519,7 @@ export default function Home() {
                     type="email"
                     id="email"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900 bg-white"
                   />
                 </div>
 
@@ -521,7 +531,7 @@ export default function Home() {
                     type="text"
                     id="subject"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900 bg-white"
                   />
                 </div>
 
@@ -533,7 +543,7 @@ export default function Home() {
                     id="message"
                     required
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900 bg-white"
                   ></textarea>
                 </div>
 
@@ -545,7 +555,7 @@ export default function Home() {
                     type="file"
                     id="attachment"
                     accept=".pdf"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c7d316] file:text-[#343234] hover:file:bg-[#b3c014] file:cursor-pointer"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#c7d316] focus:border-transparent text-gray-900 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c7d316] file:text-[#343234] hover:file:bg-[#b3c014] file:cursor-pointer"
                   />
                   <p className="text-xs text-gray-500 mt-1">PDF bestand, maximaal 5MB</p>
                 </div>

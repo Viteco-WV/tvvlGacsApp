@@ -616,7 +616,7 @@ export default function VerwarmingssysteemPage() {
                   onChange={(e) => handleAnswerChange(question.id as string, e.target.value)}
                   className="text-[#343234] focus:ring-green-500"
                 />
-                <span>{option}</span>
+                <span className="text-gray-900">{option}</span>
               </label>
             ))}
           </div>
@@ -674,12 +674,22 @@ export default function VerwarmingssysteemPage() {
               className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
             />
             {currentAnswer && (
-              <div className="mt-2">
+              <div className="mt-2 relative">
                 <img 
                   src={currentAnswer} 
                   alt="Uploaded" 
                   className="max-w-xs h-32 object-cover rounded-md border"
                 />
+                <button
+                  type="button"
+                  onClick={() => handleAnswerChange(question.id as string, '')}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors duration-200"
+                  title="Verwijder foto"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
             )}
           </div>

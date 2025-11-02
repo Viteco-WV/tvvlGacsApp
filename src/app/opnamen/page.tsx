@@ -307,13 +307,20 @@ export default function OpnamenOverviewPage() {
 
       {/* Modal voor checklist type selectie */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)'
+          }}
+        >
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold text-[#343234] mb-6 text-center">
-              Kies Checklist Type
+              Kies checklist type
             </h2>
             <p className="text-gray-600 mb-8 text-center">
-              Selecteer het type checklist dat het beste past bij uw audit
+              Selecteer het type checklist dat het<br />beste past bij uw audit
             </p>
             
             <div className="space-y-4">
@@ -322,7 +329,7 @@ export default function OpnamenOverviewPage() {
                 className="w-full bg-[#c7d316] text-[#343234] px-6 py-4 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-bold text-left flex items-center justify-between"
               >
                 <div>
-                  <div className="text-lg font-semibold">Traditionele Checklist</div>
+                  <div className="text-lg font-semibold">Traditionele checklist</div>
                   <div className="text-sm opacity-90">Standaard GACS audit proces</div>
                 </div>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,10 +339,13 @@ export default function OpnamenOverviewPage() {
               
               <button
                 onClick={() => handleSelectChecklistType('advanced')}
-                className="w-full bg-blue-500 text-white px-6 py-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-bold text-left flex items-center justify-between"
+                className="w-full text-white px-6 py-4 rounded-lg transition-colors duration-200 font-bold text-left flex items-center justify-between"
+                style={{ backgroundColor: '#4287f5' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3670d9'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4287f5'}
               >
                 <div>
-                  <div className="text-lg font-semibold">Checklist Geavanceerd</div>
+                  <div className="text-lg font-semibold">Checklist geavanceerd</div>
                   <div className="text-sm opacity-90">Uitgebreide analyse met extra functies</div>
                 </div>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
