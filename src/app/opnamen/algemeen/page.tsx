@@ -552,7 +552,7 @@ export default function AlgemeenPage() {
                 <div className="pt-6 flex flex-col gap-4 sm:flex-row justify-center">
                   <button
                     onClick={handleStartOpnamen}
-                    className="w-full sm:w-auto bg-[#B7D840] text-[#222] py-3 px-6 rounded-md hover:bg-[#A0C52F] transition-colors duration-200 font-medium text-lg border border-[#B7D840] shadow-sm"
+                    className="w-full sm:w-auto bg-[#B7D840] text-[#222] py-3 px-6 rounded-md hover:bg-[#A0C52F] transition-colors duration-200 font-bold text-lg border border-[#B7D840] shadow-sm"
                   >
                     Start Opnamen
                   </button>

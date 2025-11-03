@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type * as L from 'leaflet';
 
 interface MapComponentProps {
   height?: string;
@@ -11,7 +12,7 @@ interface MapComponentProps {
 
 export default function MapComponent({ height = "h-64", latitude, longitude, address }: MapComponentProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function MapComponent({ height = "h-64", latitude, longitude, add
     // Dynamically import Leaflet only on client side
     import('leaflet').then((L) => {
       // Fix voor default markers in Leaflet
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -44,6 +46,7 @@ export default function MapComponent({ height = "h-64", latitude, longitude, add
       }
 
       // Maak kaart instance
+      if (!mapRef.current) return;
       const map = L.map(mapRef.current).setView([centerLat, centerLon], zoom);
 
       // Voeg OpenStreetMap tiles toe (grijstinten)

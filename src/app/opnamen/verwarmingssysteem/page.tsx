@@ -762,7 +762,7 @@ export default function VerwarmingssysteemPage() {
                       {sectionName}
                     </h2>
                     <div className="space-y-6">
-                      {sectionQuestions.map((question, index) => {
+                        {sectionQuestions.map((question) => {
                         const renderedQuestion = renderQuestion(question);
                         if (!renderedQuestion) return null;
                         

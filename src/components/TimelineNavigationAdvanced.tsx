@@ -57,10 +57,18 @@ export default function TimelineNavigationAdvanced() {
           {sections.map((section, index) => {
             const isCompleted = completedSections.includes(section.storageKey);
             const isActive = pathname === section.path;
-            // Allow navigation to any completed section or the next available section
-            const isAccessible = index === 0 || 
-                               completedSections.includes(sections[index - 1]?.storageKey) || 
-                               completedSections.includes(section.storageKey);
+            
+            // Find the current section index
+            const currentIndex = sections.findIndex(s => s.path === pathname);
+            
+            // Allow navigation to:
+            // 1. Any section before the current one (already visited)
+            // 2. Any completed section
+            // 3. The next section after the last completed one
+            const isAccessible = index < currentIndex || 
+                               isCompleted || 
+                               index === 0 || 
+                               completedSections.includes(sections[index - 1]?.storageKey);
             
             return (
               <div key={section.id} className="flex flex-col items-center">

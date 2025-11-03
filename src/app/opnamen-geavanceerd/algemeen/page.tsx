@@ -66,7 +66,7 @@ export default function AlgemeenGeavanceerdPage() {
   const [addressResults, setAddressResults] = useState<AddressResult[]>([]);
   const [showAddressTable, setShowAddressTable] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [energyLabelData, setEnergyLabelData] = useState<any>(null);
+  const [energyLabelData, setEnergyLabelData] = useState<{ energyClass?: string; energyIndex?: number; energielabel?: string; energieindex?: number; geldigheidsdatum?: string } | null>(null);
   const [isLoadingEnergyLabel, setIsLoadingEnergyLabel] = useState(false);
   const [contactPersons, setContactPersons] = useState<ContactPerson[]>([]);
   const [newContactPerson, setNewContactPerson] = useState<ContactPerson>({
@@ -97,14 +97,6 @@ export default function AlgemeenGeavanceerdPage() {
     };
     
     return typeMapping[bagType.toLowerCase()] || 'ander';
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setBuildingData(prev => ({
-      ...prev,
-      [name]: value
-    }));
   };
 
   const handleContactPersonChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -177,7 +169,7 @@ export default function AlgemeenGeavanceerdPage() {
       } else {
         setEnergyLabelData(null);
       }
-    } catch (error) {
+    } catch {
       // Stilletjes afhandelen - geen errors tonen
       // Gewoon null teruggeven zodat gebruiker handmatig kan invullen
       setEnergyLabelData(null);
@@ -238,8 +230,8 @@ export default function AlgemeenGeavanceerdPage() {
             return;
           }
         }
-      } catch (apiError) {
-        // console.log('BAG API niet beschikbaar, gebruik mock data:', apiError);
+      } catch {
+        // console.log('BAG API niet beschikbaar, gebruik mock data');
       }
       
       // Fallback naar mock data
@@ -295,143 +287,9 @@ export default function AlgemeenGeavanceerdPage() {
       
       setAddressResults(filteredAddresses);
       setShowAddressTable(true);
-    } catch (error) {
+    } catch {
       // console.error('Error searching addresses:', error);
       alert('Er is een fout opgetreden bij het zoeken naar adressen.');
-    } finally {
-      setIsLoadingAddress(false);
-    }
-  };
-
-  const handlePostcodeLookup = async () => {
-    if (!buildingData.postcode || !buildingData.houseNumber) {
-      alert('Vul zowel postcode als huisnummer in');
-      return;
-    }
-
-    setIsLoadingAddress(true);
-    try {
-      // console.log('Zoeken naar adressen voor:', buildingData.postcode, buildingData.houseNumber, buildingData.houseAddition);
-      
-      // Probeer eerst BAG API, fallback naar mock data als het niet werkt
-      try {
-        // Bouw de parameters op zoals in de Python code
-        const params = new URLSearchParams({
-          postcode: buildingData.postcode,
-          huisnummer: buildingData.houseNumber,
-          exacteMatch: 'false',
-          page: '1',
-          pageSize: '20',
-          inclusiefEindStatus: 'true'
-        });
-        
-        // Voeg toevoeging toe als die is ingevuld
-        if (buildingData.houseAddition) {
-          params.append('huisnummertoevoeging', buildingData.houseAddition);
-        }
-        
-        const response = await fetch(`https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/adressenuitgebreid?${params.toString()}`, {
-          headers: {
-            'X-Api-Key': 'l788677df29fd64c17a521dd7d5d9b0d9a',
-            'Accept': 'application/hal+json',
-            'Accept-Crs': 'epsg:28992'
-          }
-        });
-       
-        if (response.ok) {
-          const data = await response.json();
-          // console.log('BAG API response:', data);
-          
-          if (data._embedded && data._embedded.adressen && data._embedded.adressen.length > 0) {
-            const addresses = data._embedded.adressen;
-            
-            // Transform BAG data naar ons formaat
-            const transformedAddresses = addresses.map((addr: Record<string, unknown>) => ({
-              openbareRuimteNaam: (addr.openbareRuimte as Record<string, unknown>)?.openbareRuimteNaam as string || (addr.openbareRuimteNaam as string) || '',
-              huisnummer: addr.huisnummer as string,
-              huisletter: (addr.huisletter as string) || '',
-              huisnummertoevoeging: (addr.huisnummertoevoeging as string) || '',
-              postcode: addr.postcode as string,
-              woonplaatsNaam: (addr.woonplaats as Record<string, unknown>)?.woonplaatsNaam as string || (addr.woonplaatsNaam as string) || '',
-              verblijfsobjectIdentificatie: addr.verblijfsobjectIdentificatie as string,
-              oppervlakte: (addr.verblijfsobject as Record<string, unknown>)?.oppervlakte as number || null
-            }));
-          
-            setAddressResults(transformedAddresses);
-            setShowAddressTable(true);
-            return;
-          }
-        }
-      } catch (apiError) {
-        // console.log('BAG API niet beschikbaar, gebruik mock data:', apiError);
-      }
-      
-      // Fallback naar mock data
-      // console.log('Gebruik mock data voor testen');
-      const mockAddresses = [
-        {
-          openbareRuimteNaam: 'Korenmolenlaan',
-          huisnummer: buildingData.houseNumber,
-          huisletter: '',
-          huisnummertoevoeging: '',
-          postcode: buildingData.postcode,
-          woonplaatsNaam: 'Amsterdam',
-          verblijfsobjectIdentificatie: '123456789',
-          oppervlakte: 1250,
-          latitude: 52.3676,
-          longitude: 4.9041
-        },
-        {
-          openbareRuimteNaam: 'Korenmolenlaan',
-          huisnummer: buildingData.houseNumber,
-          huisletter: '',
-          huisnummertoevoeging: 'A',
-          postcode: buildingData.postcode,
-          woonplaatsNaam: 'Amsterdam',
-          verblijfsobjectIdentificatie: '123456790',
-          oppervlakte: 850,
-          latitude: 52.3677,
-          longitude: 4.9042
-        },
-        {
-          openbareRuimteNaam: 'Korenmolenlaan',
-          huisnummer: buildingData.houseNumber,
-          huisletter: '',
-          huisnummertoevoeging: 'B',
-          postcode: buildingData.postcode,
-          woonplaatsNaam: 'Amsterdam',
-          verblijfsobjectIdentificatie: '123456791',
-          oppervlakte: 1100,
-          latitude: 52.3678,
-          longitude: 4.9043
-        },
-        {
-          openbareRuimteNaam: 'Korenmolenlaan',
-          huisnummer: buildingData.houseNumber,
-          huisletter: '',
-          huisnummertoevoeging: '2',
-          postcode: buildingData.postcode,
-          woonplaatsNaam: 'Amsterdam',
-          verblijfsobjectIdentificatie: '123456792',
-          oppervlakte: 950,
-          latitude: 52.3679,
-          longitude: 4.9044
-        }
-      ];
-      
-      // Filter op toevoeging als die is ingevuld
-      let filteredAddresses = mockAddresses;
-      if (buildingData.houseAddition) {
-        filteredAddresses = mockAddresses.filter(addr => 
-          addr.huisnummertoevoeging === buildingData.houseAddition
-        );
-      }
-      
-      setAddressResults(filteredAddresses);
-      setShowAddressTable(true);
-    } catch (error) {
-      // console.error('Error fetching address:', error);
-      alert('Er is een fout opgetreden bij het ophalen van het adres.');
     } finally {
       setIsLoadingAddress(false);
     }
@@ -969,7 +827,7 @@ export default function AlgemeenGeavanceerdPage() {
               <div className="pt-6 flex flex-col gap-4 sm:flex-row justify-center">
                 <button
                   onClick={handleStartOpnamen}
-                  className="w-full sm:w-auto bg-[#B7D840] text-[#222] py-3 px-6 rounded-md hover:bg-[#A0C52F] transition-colors duration-200 font-medium text-lg border border-[#B7D840] shadow-sm"
+                  className="w-full sm:w-auto bg-[#B7D840] text-[#222] py-3 px-6 rounded-md hover:bg-[#A0C52F] transition-colors duration-200 font-bold text-lg border border-[#B7D840] shadow-sm"
                 >
                   Start opnamen
                 </button>
