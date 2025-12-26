@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import MigrateLocalStorageButton from '@/components/MigrateLocalStorageButton';
 
 interface AuditRecord {
   id: string;
@@ -32,9 +33,52 @@ export default function OpnamenOverviewPage() {
     loadAuditRecords();
   }, []);
 
-  const loadAuditRecords = () => {
+  const loadAuditRecords = async () => {
     try {
-      // Haal alle opgeslagen audits op uit localStorage
+      const records: AuditRecord[] = [];
+
+      // 1. Haal audits op uit database
+      try {
+        const response = await fetch('/api/opnamen');
+        if (response.ok) {
+          const opnamen = await response.json();
+          
+          for (const opname of opnamen) {
+            // Haal secties op voor deze opname
+            const sectiesResponse = await fetch(`/api/opnamen/${opname.id}/antwoorden`);
+            const antwoorden = sectiesResponse.ok ? await sectiesResponse.json() : [];
+            
+            // Groepeer antwoorden per sectie
+            const sectiesMap: Record<string, boolean> = {};
+            antwoorden.forEach((antwoord: { sectie_naam: string }) => {
+              sectiesMap[antwoord.sectie_naam] = true;
+            });
+
+            records.push({
+              id: opname.id,
+              buildingName: opname.gebouwnaam || 'Onbekend gebouw',
+              address: opname.adres || 'Geen adres',
+              buildingType: opname.gebouwtype || 'Niet opgegeven',
+              date: opname.datum_opname ? new Date(opname.datum_opname).toLocaleDateString('nl-NL') : new Date().toLocaleDateString('nl-NL'),
+              status: opname.status === 'completed' ? 'completed' : opname.status === 'in_progress' ? 'in_progress' : 'draft',
+              sections: {
+                algemeen: !!opname.gebouwnaam,
+                verwarmingssysteem: !!sectiesMap['verwarmingssysteem'],
+                warmTapwater: !!sectiesMap['warmTapwater'],
+                ventilatie: !!sectiesMap['ventilatie'],
+                verlichting: !!sectiesMap['verlichting'],
+                airconditioning: !!sectiesMap['airconditioning'],
+                zonwering: !!sectiesMap['zonwering'],
+                gebouwmanagement: !!sectiesMap['gebouwmanagement'],
+              }
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Fout bij laden audits uit database:', error);
+      }
+
+      // 2. Haal ook audits op uit localStorage (backward compatibility)
       const savedBuildingData = localStorage.getItem('gacsBuildingData');
       const savedOpnamenData = localStorage.getItem('gacsOpnamenData');
       
@@ -48,8 +92,16 @@ export default function OpnamenOverviewPage() {
         );
         
         if (hasAnyData) {
-          const record: AuditRecord = {
-            id: Date.now().toString(),
+          // Check of deze audit al in de database staat (op basis van gebouwnaam en adres)
+          const existsInDatabase = records.some(r => 
+            r.buildingName === buildingData.buildingName && 
+            r.address === buildingData.address
+          );
+
+          // Voeg alleen toe als het niet al in de database staat
+          if (!existsInDatabase) {
+            records.push({
+              id: `local-${Date.now()}`,
             buildingName: buildingData.buildingName || 'Onbekend gebouw',
             address: buildingData.address || 'Geen adres',
             buildingType: buildingData.buildingType || 'Niet opgegeven',
@@ -65,11 +117,12 @@ export default function OpnamenOverviewPage() {
               zonwering: !!opnamenData.zonwering,
               gebouwmanagement: !!opnamenData.gebouwmanagement,
             }
-          };
-          
-          setAuditRecords([record]);
+            });
+          }
         }
       }
+
+      setAuditRecords(records);
     } catch (error) {
       console.error('Fout bij laden audit records:', error);
     } finally {
@@ -81,30 +134,85 @@ export default function OpnamenOverviewPage() {
     setShowModal(true);
   };
 
-  const handleSelectChecklistType = (type: 'traditional' | 'advanced') => {
+  const handleStartTraditionalAudit = async () => {
     // Wis alle bestaande data
     localStorage.removeItem('gacsBuildingData');
     localStorage.removeItem('gacsOpnamenData');
     
-    if (type === 'traditional') {
-      router.push('/opnamen/algemeen');
-    } else {
-      router.push('/opnamen-geavanceerd/algemeen');
+    try {
+      // Maak direct een nieuwe lege opname aan in database
+      const response = await fetch('/api/opnamen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          opnameType: 'basis',
+          gebouwnaam: 'Nieuw gebouw',
+          adres: '',
+          datumOpname: new Date().toISOString().split('T')[0],
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Fout bij aanmaken opname');
+      }
+
+      const newOpname = await response.json();
+      const newOpnameId = newOpname.id;
+
+      // Navigeer direct naar algemeen pagina met opnameId in URL
+      router.push(`/opnamen/${newOpnameId}/algemeen`);
+    } catch (error) {
+      console.error('Fout bij aanmaken opname:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Fout bij aanmaken opname';
+      alert(`Fout bij starten nieuwe audit: ${errorMessage}`);
     }
     
     setShowModal(false);
   };
 
-  const handleContinueAudit = () => {
-    // Laad de data en ga naar de voltooid pagina
+  const handleContinueAudit = (recordId?: string) => {
+    // Als het een database record is, navigeer naar voltooid pagina met ID
+    if (recordId && !recordId.startsWith('local-')) {
+      router.push(`/opnamen/voltooid/${recordId}`);
+    } else {
+      // Voor localStorage records, ga naar oude voltooid pagina
     router.push('/opnamen/voltooid');
+    }
   };
 
-  const handleDeleteAudit = () => {
-    if (confirm('Weet je zeker dat je deze audit wilt verwijderen?')) {
+  const handleDeleteAudit = async (recordId: string) => {
+    if (confirm('Weet je zeker dat je deze audit wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.')) {
+      try {
+        // Als het een database record is, verwijder uit database
+        if (!recordId.startsWith('local-')) {
+          const response = await fetch(`/api/opnamen/${recordId}`, {
+            method: 'DELETE',
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Onbekende fout' }));
+            throw new Error(errorData.error || 'Fout bij verwijderen uit database');
+          }
+          
+          // Toon succesmelding
+          alert('Audit succesvol verwijderd');
+        } else {
+          // Als het een localStorage record is, verwijder uit localStorage
       localStorage.removeItem('gacsBuildingData');
       localStorage.removeItem('gacsOpnamenData');
-      setAuditRecords([]);
+          alert('Audit succesvol verwijderd');
+        }
+        
+        // Herlaad de lijst
+        await loadAuditRecords();
+      } catch (error) {
+        console.error('Fout bij verwijderen audit:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Onbekende fout';
+        alert(`Fout bij verwijderen audit: ${errorMessage}`);
+      }
     }
   };
 
@@ -199,6 +307,9 @@ export default function OpnamenOverviewPage() {
             </div>
           </div>
 
+          {/* Migratie Button */}
+          <MigrateLocalStorageButton />
+
           {/* Audit Records */}
           {auditRecords.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-8 text-center">
@@ -249,13 +360,13 @@ export default function OpnamenOverviewPage() {
                       
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleContinueAudit()}
+                          onClick={() => handleContinueAudit(record.id)}
                           className="bg-[#c7d316] text-[#343234] px-4 py-2 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-medium text-sm"
                         >
                           Bekijken
                         </button>
                         <button
-                          onClick={() => handleDeleteAudit()}
+                          onClick={() => handleDeleteAudit(record.id)}
                           className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium text-sm"
                         >
                           Verwijderen
@@ -290,22 +401,10 @@ export default function OpnamenOverviewPage() {
               ))}
             </div>
           )}
-
-          {/* Information Panel */}
-          <div className="bg-blue-50 rounded-lg p-6 mt-8">
-            <h3 className="font-semibold text-blue-800 mb-3">Informatie</h3>
-            <ul className="text-sm text-blue-700 space-y-2">
-              <li>• Alle audits worden lokaal opgeslagen in uw browser</li>
-              <li>• U kunt meerdere audits beheren en vergelijken</li>
-              <li>• Klik op &quot;Bekijken&quot; om een audit te openen</li>
-              <li>• Gebruik &quot;Verwijderen&quot; om een audit permanent te wissen</li>
-              <li>• Start een nieuwe audit om een ander gebouw te registreren</li>
-            </ul>
-          </div>
         </div>
       </div>
 
-      {/* Modal voor checklist type selectie */}
+      {/* Modal voor nieuwe audit starten */}
       {showModal && (
         <div 
           className="fixed inset-0 flex items-center justify-center z-50"
@@ -317,36 +416,21 @@ export default function OpnamenOverviewPage() {
         >
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold text-[#343234] mb-6 text-center">
-              Kies checklist type
+              Nieuwe audit starten
             </h2>
             <p className="text-gray-600 mb-8 text-center">
-              Selecteer het type checklist dat het<br />beste past bij uw audit
+              Weet je zeker dat je een nieuwe audit wilt starten?<br />
+              Alle niet-opgeslagen wijzigingen gaan verloren.
             </p>
             
             <div className="space-y-4">
               <button
-                onClick={() => handleSelectChecklistType('traditional')}
+                onClick={handleStartTraditionalAudit}
                 className="w-full bg-[#c7d316] text-[#343234] px-6 py-4 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-bold text-left flex items-center justify-between"
               >
                 <div>
-                  <div className="text-lg font-semibold">Traditionele checklist</div>
-                  <div className="text-sm opacity-90">Standaard GACS audit proces</div>
-                </div>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              
-              <button
-                onClick={() => handleSelectChecklistType('advanced')}
-                className="w-full text-white px-6 py-4 rounded-lg transition-colors duration-200 font-bold text-left flex items-center justify-between"
-                style={{ backgroundColor: '#4287f5' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3670d9'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4287f5'}
-              >
-                <div>
-                  <div className="text-lg font-semibold">Checklist geavanceerd</div>
-                  <div className="text-sm opacity-90">Uitgebreide analyse met extra functies</div>
+                  <div className="text-lg font-semibold">Start nieuwe audit</div>
+                  <div className="text-sm opacity-90">Begin met een nieuwe GACS audit</div>
                 </div>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

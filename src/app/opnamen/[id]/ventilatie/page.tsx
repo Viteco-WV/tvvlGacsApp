@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import TimelineNavigation from '@/components/TimelineNavigation';
 import Header from '@/components/Header';
 import { useOpnameId } from '@/lib/useOpname';
 import { saveAnswersToDatabase } from '@/lib/save-answers';
 import { uploadPhotoToDatabase } from '@/lib/photo-handler';
+import { deleteSectieFoto } from '@/lib/opname-api';
 
 interface BuildingData {
   buildingName: string;
@@ -16,55 +17,64 @@ interface BuildingData {
   date: string;
 }
 
-export default function GebouwmanagementPage() {
+export default function VentilatiePage() {
+  const params = useParams();
+  const opnameId = params?.id as string;
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<Map<string, File>>(new Map());
+  const [photoIds, setPhotoIds] = useState<Map<string, string>>(new Map()); // Map van vraagId -> fotoId
   const router = useRouter();
-  const [opnameId] = useOpnameId();
+  const [, setOpnameId] = useOpnameId();
+
+  useEffect(() => {
+    if (opnameId) {
+      setOpnameId(opnameId);
+    }
+  }, [opnameId, setOpnameId]);
 
   const questions = [
-    // Sectie 1: Regeling setpoint
+    // Sectie 1: Regeling van ventilatiestroom in de ruimte
     {
-      id: 'setpoint_van_toepassing',
+      id: 'ventilatiestroom_van_toepassing',
       question: 'Vraag 1.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
     },
     {
-      id: 'setpoint_regeling',
-      question: 'Vraag 1.2 - Hoe is de regeling setpoint?',
+      id: 'ventilatiestroom_regeling',
+      question: 'Vraag 1.2 - Hoe is de regeling van ventilatiestroom in de ruimte?',
       type: 'select',
       options: [
-        'Handmatige setpoint instelling per ruimte',
-        'Setpoint instelling alleen vanuit GEDECENTRALISEERDE technische ruimtes',
-        'Setpoint instelling vanuit een centraal punt',
-        'Setpoint instelling vanuit een centraal punt met regelmatige overschrijving van gebruikersinstellingen'
+        'Geen automatische controle',
+        'Tijd gestuurde regeling',
+        'Aanwezigheidsdetectie',
+        'Vraag gestuurde regeling'
       ],
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'ventilatiestroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
     },    {
-      id: 'setpoint_foto',
+      id: 'ventilatiestroom_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'ventilatiestroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
     },
     {
-      id: 'setpoint_notities',
+      id: 'ventilatiestroom_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'ventilatiestroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
     },
 
     {
-      id: 'setpoint_verbetermaatregel',
+      id: 'ventilatiestroom_verbetermaatregel',
       question: 'Vraag 1.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -72,49 +82,49 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'ventilatiestroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling van ventilatiestroom in de ruimte'
     },
-    // Sectie 2: Runtime regeling
+    // Sectie 2: Temperatuurregeling in de ruimte (luchtsystemen)
     {
-      id: 'runtime_van_toepassing',
+      id: 'temperatuur_lucht_van_toepassing',
       question: 'Vraag 2.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '2 - Runtime regeling'
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
     },
     {
-      id: 'runtime_regeling',
-      question: 'Vraag 2.2 - Hoe is de runtime regeling?',
+      id: 'temperatuur_lucht_regeling',
+      question: 'Vraag 2.2 - Hoe is de temperatuurregeling in de ruimte (luchtsystemen)?',
       type: 'select',
       options: [
-        'Handmatige instelling',
-        'Individuele tijdgestuurde regeling met vaste schakelpunten',
-        'Individuele tijdgestuurde regeling met variabele schakelpunten'
+        'Aan-uit regeling',
+        'Variabele regeling',
+        'Vraag gestuurde regeling'
       ],
-      conditional: 'runtime_van_toepassing',
+      conditional: 'temperatuur_lucht_van_toepassing',
       conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
     },    {
-      id: 'runtime_foto',
+      id: 'temperatuur_lucht_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'runtime_van_toepassing',
+      conditional: 'temperatuur_lucht_van_toepassing',
       conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
     },
     {
-      id: 'runtime_notities',
+      id: 'temperatuur_lucht_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'runtime_van_toepassing',
+      conditional: 'temperatuur_lucht_van_toepassing',
       conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
     },
 
     {
-      id: 'runtime_verbetermaatregel',
+      id: 'temperatuur_lucht_verbetermaatregel',
       question: 'Vraag 2.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -122,49 +132,48 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'runtime_van_toepassing',
+      conditional: 'temperatuur_lucht_van_toepassing',
       conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
+      section: '2 - Temperatuurregeling in de ruimte (luchtsystemen)'
     },
-    // Sectie 3: Storingsdetectie en foutdiagnose
+    // Sectie 3: Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)
     {
-      id: 'storingsdetectie_van_toepassing',
+      id: 'temperatuur_gecombineerd_van_toepassing',
       question: 'Vraag 3.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '3 - Storingsdetectie en foutdiagnose'
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
     },
     {
-      id: 'storingsdetectie_regeling',
-      question: 'Vraag 3.2 - Hoe is de storingsdetectie en foutdiagnose?',
+      id: 'temperatuur_gecombineerd_regeling',
+      question: 'Vraag 3.2 - Hoe is de temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)?',
       type: 'select',
       options: [
-        'Geen centrale detectie van storingen en alarmen',
-        'Centrale indicatie van storingen of alarmen',
-        'Centrale indicatie van fouten of alarmen met diagnostische functies'
+        'Geen afstemming',
+        'Afstemming'
       ],
-      conditional: 'storingsdetectie_van_toepassing',
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
       conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
     },    {
-      id: 'storingsdetectie_foto',
+      id: 'temperatuur_gecombineerd_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'storingsdetectie_van_toepassing',
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
       conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
     },
     {
-      id: 'storingsdetectie_notities',
+      id: 'temperatuur_gecombineerd_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'storingsdetectie_van_toepassing',
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
       conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
     },
 
     {
-      id: 'storingsdetectie_verbetermaatregel',
+      id: 'temperatuur_gecombineerd_verbetermaatregel',
       question: 'Vraag 3.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -172,49 +181,50 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'storingsdetectie_van_toepassing',
+      conditional: 'temperatuur_gecombineerd_van_toepassing',
       conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
+      section: '3 - Temperatuurregeling in de ruimte (gecombineerde lucht-watersystemen)'
     },
-    // Sectie 4: Energieconsumptie en binnenklimaat rapportage
+    // Sectie 4: Buitenluchtstroom regeling
     {
-      id: 'energieconsumptie_van_toepassing',
+      id: 'buitenluchtstroom_van_toepassing',
       question: 'Vraag 4.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+      section: '4 - Buitenluchtstroom regeling'
     },
     {
-      id: 'energieconsumptie_regeling',
-      question: 'Vraag 4.2 - Hoe is de energieconsumptie en binnenklimaat rapportage?',
+      id: 'buitenluchtstroom_regeling',
+      question: 'Vraag 4.2 - Hoe is de buitenluchtstroom regeling?',
       type: 'select',
       options: [
-        'Alleen indicatie van gemeten waarden (zoals temperatuur, meterstanden)',
-        'Rapportage van trends in gemeten waarden en energieconsumptie',
-        'Analyse van gemeten waarden, bepaling van energieprestatie en benchmarking'
+        'Vaste verhouding buitenluchtstroom',
+        'Tijd gestuurde getrapte regeling verhouding buitenlucht',
+        'Vraag gestuurde getrapte regeling verhouding buitenlucht',
+        'Variabele regeling'
       ],
-      conditional: 'energieconsumptie_van_toepassing',
+      conditional: 'buitenluchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+      section: '4 - Buitenluchtstroom regeling'
     },    {
-      id: 'energieconsumptie_foto',
+      id: 'buitenluchtstroom_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'energieconsumptie_van_toepassing',
+      conditional: 'buitenluchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+      section: '4 - Buitenluchtstroom regeling'
     },
     {
-      id: 'energieconsumptie_notities',
+      id: 'buitenluchtstroom_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'energieconsumptie_van_toepassing',
+      conditional: 'buitenluchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+      section: '4 - Buitenluchtstroom regeling'
     },
 
     {
-      id: 'energieconsumptie_verbetermaatregel',
+      id: 'buitenluchtstroom_verbetermaatregel',
       question: 'Vraag 4.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -222,49 +232,50 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'energieconsumptie_van_toepassing',
+      conditional: 'buitenluchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
+      section: '4 - Buitenluchtstroom regeling'
     },
-    // Sectie 5: Lokale energieproductie en hernieuwbare energie
+    // Sectie 5: Luchtstroom of luchtdrukregeling van air handeling unit
     {
-      id: 'lokale_energie_van_toepassing',
+      id: 'luchtstroom_van_toepassing',
       question: 'Vraag 5.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
     },
     {
-      id: 'lokale_energie_regeling',
-      question: 'Vraag 5.2 - Hoe is de lokale energieproductie en hernieuwbare energie?',
+      id: 'luchtstroom_regeling',
+      question: 'Vraag 5.2 - Hoe is de luchtstroom of luchtdrukregeling van air handeling unit?',
       type: 'select',
       options: [
-        'Geen (alle vormen van regeling van lokale energieproductie zijn toegestaan)',
-        'Ongereguleerde energieproductie, gebaseerd op de beschikbaarheid van de energiebron met teruglevering van energieoverschotten aan het net',
-        'Energie'
+        'Geen automatische regeling',
+        'Tijd gestuurde aan-uit regeling',
+        'Multi stap regeling',
+        'Automatische luchtstroom of drukregeling (met of zonder reset)'
       ],
-      conditional: 'lokale_energie_van_toepassing',
+      conditional: 'luchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
     },    {
-      id: 'lokale_energie_foto',
+      id: 'luchtstroom_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'lokale_energie_van_toepassing',
+      conditional: 'luchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
     },
     {
-      id: 'lokale_energie_notities',
+      id: 'luchtstroom_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'lokale_energie_van_toepassing',
+      conditional: 'luchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
     },
 
     {
-      id: 'lokale_energie_verbetermaatregel',
+      id: 'luchtstroom_verbetermaatregel',
       question: 'Vraag 5.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -272,48 +283,48 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'lokale_energie_van_toepassing',
+      conditional: 'luchtstroom_van_toepassing',
       conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
+      section: '5 - Luchtstroom of luchtdrukregeling van air handeling unit'
     },
-    // Sectie 6: Hergebruik restwarmte en verschuiving warmtevraag
+    // Sectie 6: Warmte terugwinning: vorstbescherming
     {
-      id: 'restwarmte_van_toepassing',
+      id: 'vorstbescherming_van_toepassing',
       question: 'Vraag 6.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+      section: '6 - Warmte terugwinning: vorstbescherming'
     },
     {
-      id: 'restwarmte_regeling',
-      question: 'Vraag 6.2 - Hoe is het hergebruik restwarmte en verschuiving warmtevraag?',
+      id: 'vorstbescherming_regeling',
+      question: 'Vraag 6.2 - Hoe is de warmte terugwinning vorstbescherming?',
       type: 'select',
       options: [
-        'Direct hergebruik van restwarmte of verschuiving warmtevraag',
-        'Gereguleerd gebruik van restwarmte en verschuiving warmtevraag (inclusief gebruik van thermische energieopslag)'
+        'Zonder vorstbescherming',
+        'Met vorstbescherming'
       ],
-      conditional: 'restwarmte_van_toepassing',
+      conditional: 'vorstbescherming_van_toepassing',
       conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+      section: '6 - Warmte terugwinning: vorstbescherming'
     },    {
-      id: 'restwarmte_foto',
+      id: 'vorstbescherming_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'restwarmte_van_toepassing',
+      conditional: 'vorstbescherming_van_toepassing',
       conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+      section: '6 - Warmte terugwinning: vorstbescherming'
     },
     {
-      id: 'restwarmte_notities',
+      id: 'vorstbescherming_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'restwarmte_van_toepassing',
+      conditional: 'vorstbescherming_van_toepassing',
       conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+      section: '6 - Warmte terugwinning: vorstbescherming'
     },
 
     {
-      id: 'restwarmte_verbetermaatregel',
+      id: 'vorstbescherming_verbetermaatregel',
       question: 'Vraag 6.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -321,50 +332,48 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'restwarmte_van_toepassing',
+      conditional: 'vorstbescherming_van_toepassing',
       conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
+      section: '6 - Warmte terugwinning: vorstbescherming'
     },
-    // Sectie 7: Smart grid integratie
+    // Sectie 7: Warmte terugwinning: oververhitting bescherming
     {
-      id: 'smart_grid_van_toepassing',
+      id: 'oververhitting_van_toepassing',
       question: 'Vraag 7.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '7 - Smart grid integratie'
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
     },
     {
-      id: 'smart_grid_regeling',
-      question: 'Vraag 7.2 - Hoe is de smart grid integratie?',
+      id: 'oververhitting_regeling',
+      question: 'Vraag 7.2 - Hoe is de warmte terugwinning oververhitting bescherming?',
       type: 'select',
       options: [
-        'Geen (alle vormen van smart grid integratie zijn toegestaan)',
-        'Geen coördinatie tussen energienetten (net) en gebouwsystemen',
-        'Coördinatie tussen energienetten (net) en gebouwsystemen met lastverschuiving'
+        'Zonder oververhitting bescherming',
+        'Met oververhitting bescherming'
       ],
-      conditional: 'smart_grid_van_toepassing',
+      conditional: 'oververhitting_van_toepassing',
       conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
-    },
-    {
-      id: 'smart_grid_foto',
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
+    },    {
+      id: 'oververhitting_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'smart_grid_van_toepassing',
+      conditional: 'oververhitting_van_toepassing',
       conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
     },
     {
-      id: 'smart_grid_notities',
+      id: 'oververhitting_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'smart_grid_van_toepassing',
+      conditional: 'oververhitting_van_toepassing',
       conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
     },
 
-        {
-      id: 'smart_grid_verbetermaatregel',
+    {
+      id: 'oververhitting_verbetermaatregel',
       question: 'Vraag 7.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -372,13 +381,170 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'smart_grid_van_toepassing',
+      conditional: 'oververhitting_van_toepassing',
       conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
+      section: '7 - Warmte terugwinning: oververhitting bescherming'
+    },
+    // Sectie 8: Vrije koeling
+    {
+      id: 'vrije_koeling_van_toepassing',
+      question: 'Vraag 8.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '8 - Vrije koeling'
+    },
+    {
+      id: 'vrije_koeling_regeling',
+      question: 'Vraag 8.2 - Hoe is de vrije koeling geregeld?',
+      type: 'select',
+      options: [
+        'Geen automatische regeling',
+        'Nachtkoeling',
+        'Vrije koeling',
+        'HX gestuurde regeling (=modulerende regeling)'
+      ],
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
+    },    {
+      id: 'vrije_koeling_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
+    },
+    {
+      id: 'vrije_koeling_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
+    },
+
+    {
+      id: 'vrije_koeling_verbetermaatregel',
+      question: 'Vraag 8.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'vrije_koeling_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '8 - Vrije koeling'
+    },
+    // Sectie 9: Regeling ventilatie temperatuur
+    {
+      id: 'ventilatie_temperatuur_van_toepassing',
+      question: 'Vraag 9.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '9 - Regeling ventilatie temperatuur'
+    },
+    {
+      id: 'ventilatie_temperatuur_regeling',
+      question: 'Vraag 9.2 - Hoe is de regeling ventilatie temperatuur?',
+      type: 'select',
+      options: [
+        'Geen automatische controle',
+        'Constante temperatuurinstelling',
+        'Variabele temperatuurinstelling met buitentemperatuur correctie',
+        'Variabele temperatuurinstelling met vraaggestuurde correctie'
+      ],
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
+    },    {
+      id: 'ventilatie_temperatuur_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
+    },
+    {
+      id: 'ventilatie_temperatuur_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
+    },
+
+    {
+      id: 'ventilatie_temperatuur_verbetermaatregel',
+      question: 'Vraag 9.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'ventilatie_temperatuur_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '9 - Regeling ventilatie temperatuur'
+    },
+    // Sectie 10: Regeling luchtvochtigheid
+    {
+      id: 'luchtvochtigheid_van_toepassing',
+      question: 'Vraag 10.1 - Van toepassing?',
+      type: 'radio',
+      options: ['Ja', 'Nee'],
+      section: '10 - Regeling luchtvochtigheid'
+    },
+    {
+      id: 'luchtvochtigheid_regeling',
+      question: 'Vraag 10.2 - Hoe is de regeling luchtvochtigheid?',
+      type: 'select',
+      options: [
+        'Geen automatische controle',
+        'Dauwpuntregeling',
+        'Directe regeling luchtvochtigheid'
+      ],
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
+    },
+    {
+      id: 'luchtvochtigheid_foto',
+      question: 'Foto uploaden',
+      type: 'file',
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
+    },
+    {
+      id: 'luchtvochtigheid_notities',
+      question: 'Notities over de opnamen',
+      type: 'textarea',
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
+    },
+
+        {
+      id: 'luchtvochtigheid_verbetermaatregel',
+      question: 'Vraag 10.3 - Te nemen verbetermaatregel',
+      type: 'select',
+      options: [
+        'Naar klasse C',
+        'Naar klasse B',
+        'Naar klasse A'
+      ],
+      conditional: 'luchtvochtigheid_van_toepassing',
+      conditionalValue: 'Ja',
+      section: '10 - Regeling luchtvochtigheid'
     }
   ];
 
   useEffect(() => {
+    if (opnameId) {
+      loadAnswersFromDatabase();
+    } else {
+      // Fallback naar localStorage voor backward compatibility
     const savedBuildingData = localStorage.getItem('gacsBuildingData');
     if (savedBuildingData) {
       setBuildingData(JSON.parse(savedBuildingData));
@@ -387,34 +553,103 @@ export default function GebouwmanagementPage() {
     const savedAnswers = localStorage.getItem('gacsOpnamenData');
     if (savedAnswers) {
       const parsedAnswers = JSON.parse(savedAnswers);
-      if (parsedAnswers.gebouwmanagement) {
-        setAnswers(parsedAnswers.gebouwmanagement);
+      if (parsedAnswers.ventilatie) {
+        setAnswers(parsedAnswers.ventilatie);
       }
     }
-  }, []);
+    }
+  }, [opnameId]);
+
+  const loadAnswersFromDatabase = async () => {
+    if (!opnameId) return;
+
+    try {
+      // Laad alle data in één keer via de opname endpoint
+      const opnameResponse = await fetch(`/api/opnamen/${opnameId}`);
+      if (!opnameResponse.ok) {
+        throw new Error('Fout bij ophalen opname data');
+      }
+
+      const opnameData = await opnameResponse.json();
+      
+      // Laad building data
+      setBuildingData({
+        buildingName: opnameData.gebouwnaam || '',
+        address: opnameData.adres || '',
+        buildingType: opnameData.gebouwtype || '',
+        contactPerson: opnameData.contactpersoon || '',
+        date: opnameData.datum_opname ? new Date(opnameData.datum_opname).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      });
+
+      // Laad antwoorden en foto's
+      const loadedAnswers: Record<string, string> = {};
+      
+      // Laad antwoorden
+      if (opnameData.antwoorden) {
+        opnameData.antwoorden
+          .filter((antwoord: any) => antwoord.sectie_naam === 'ventilatie')
+          .forEach((antwoord: any) => {
+            if (antwoord.antwoord_waarde) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_waarde;
+            } else if (antwoord.antwoord_nummer !== null) {
+              loadedAnswers[antwoord.vraag_id] = String(antwoord.antwoord_nummer);
+            } else if (antwoord.antwoord_boolean !== null) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_boolean ? 'true' : 'false';
+            }
+          });
+      }
+      
+      // Laad sectie foto's
+      const fotoIdsMap = new Map<string, string>();
+      if (opnameData.sectieFotos) {
+        opnameData.sectieFotos
+          .filter((foto: any) => foto.sectie_naam === 'ventilatie')
+          .forEach((foto: any) => {
+            if (foto.vraag_id && foto.bestandspad) {
+              loadedAnswers[foto.vraag_id] = foto.bestandspad.replace(/^public\//, '/');
+              if (foto.id) {
+                fotoIdsMap.set(foto.vraag_id, foto.id);
+              }
+            }
+          });
+      }
+      setPhotoIds(fotoIdsMap);
+      
+      setAnswers(loadedAnswers);
+    } catch (error) {
+      console.error('Fout bij laden antwoorden:', error);
+    }
+  };
 
   const handleAnswerChange = (questionId: string, value: string) => {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     
+    // Alleen naar localStorage schrijven als er geen opnameId is (backward compatibility)
+    if (!opnameId) {
+      try {
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.gebouwmanagement = newAnswers;
+    parsedData.ventilatie = newAnswers;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      } catch (error) {
+        console.error('localStorage quota exceeded:', error);
+      }
+    }
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    const allData = {
-      ...answers,
-      section: 'gebouwmanagement',
-      timestamp: new Date().toISOString()
-    };
-    
+      const allData = {
+        ...answers,
+        section: 'ventilatie',
+        timestamp: new Date().toISOString()
+      };
+      
       await saveAnswersToDatabase(
         opnameId,
-        'gebouwmanagement',
+        'ventilatie',
         allData,
         questions,
         'basis'
@@ -428,12 +663,12 @@ export default function GebouwmanagementPage() {
 
   const handleNext = async () => {
     await handleSave();
-    router.push('/opnamen/voltooid');
+    router.push(`/opnamen/${opnameId}/verlichting`);
   };
 
   const handlePrevious = async () => {
     await handleSave();
-    router.push('/opnamen/zonwering');
+    router.push(`/opnamen/${opnameId}/airconditioning`);
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
@@ -538,7 +773,7 @@ export default function GebouwmanagementPage() {
                     try {
                       await uploadPhotoToDatabase(
                         opnameId,
-                        'gebouwmanagement',
+                        'ventilatie',
                         file,
                         question.id as string
                       );
@@ -602,16 +837,16 @@ export default function GebouwmanagementPage() {
       <Header onSave={handleSave} />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <TimelineNavigation />
+          <TimelineNavigation onSave={handleSave} />
           
           <div className="bg-white rounded-lg shadow-xl overflow-hidden">
             <div className="bg-[#c7d316]/10 p-6 flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-[#c7d314] rounded-lg flex items-center justify-center">
-                  <span className="text-[#343234] font-bold text-lg">7</span>
+                  <span className="text-[#343234] font-bold text-lg">4</span>
                 </div>
                 <h1 className="text-xl font-bold text-[#343234]">
-                  Technisch gebouwmanagement onderdelen
+                  Ventilatie onderdelen
                 </h1>
               </div>
               <div className="bg-[#c7d316]/10 text-[#343234] px-3 py-1 rounded-full text-sm font-medium">
@@ -664,6 +899,7 @@ export default function GebouwmanagementPage() {
                   ));
                 })()}
               </div>
+
               <div className="flex justify-center mt-8 pt-6 border-t border-gray-200 space-x-4">
                 <button
                   onClick={handlePrevious}

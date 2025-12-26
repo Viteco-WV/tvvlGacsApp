@@ -233,7 +233,7 @@ export default function VoltooidPage() {
           {/* Action Buttons */}
           <div className="flex justify-center space-x-4 mb-8">
             <button
-              onClick={() => router.push('/opnamen/algemeen')}
+              onClick={() => router.push('/opnamen')}
               className="bg-[#c7d316] text-[#343234] px-6 py-3 rounded-lg hover:bg-[#b3c014] transition-colors duration-200 font-bold flex items-center"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import TimelineNavigation from '@/components/TimelineNavigation';
 import Header from '@/components/Header';
 import { useOpnameId } from '@/lib/useOpname';
 import { saveAnswersToDatabase } from '@/lib/save-answers';
 import { uploadPhotoToDatabase } from '@/lib/photo-handler';
+import { deleteSectieFoto } from '@/lib/opname-api';
 
 interface BuildingData {
   buildingName: string;
@@ -17,12 +18,21 @@ interface BuildingData {
 }
 
 export default function GebouwmanagementPage() {
+  const params = useParams();
+  const opnameId = params?.id as string;
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<Map<string, File>>(new Map());
+  const [photoIds, setPhotoIds] = useState<Map<string, string>>(new Map()); // Map van vraagId -> fotoId
   const router = useRouter();
-  const [opnameId] = useOpnameId();
+  const [, setOpnameId] = useOpnameId();
+
+  useEffect(() => {
+    if (opnameId) {
+      setOpnameId(opnameId);
+    }
+  }, [opnameId, setOpnameId]);
 
   const questions = [
     // Sectie 1: Regeling setpoint
@@ -379,6 +389,10 @@ export default function GebouwmanagementPage() {
   ];
 
   useEffect(() => {
+    if (opnameId) {
+      loadAnswersFromDatabase();
+    } else {
+      // Fallback naar localStorage voor backward compatibility
     const savedBuildingData = localStorage.getItem('gacsBuildingData');
     if (savedBuildingData) {
       setBuildingData(JSON.parse(savedBuildingData));
@@ -391,27 +405,96 @@ export default function GebouwmanagementPage() {
         setAnswers(parsedAnswers.gebouwmanagement);
       }
     }
-  }, []);
+    }
+  }, [opnameId]);
+
+  const loadAnswersFromDatabase = async () => {
+    if (!opnameId) return;
+
+    try {
+      // Laad alle data in één keer via de opname endpoint
+      const opnameResponse = await fetch(`/api/opnamen/${opnameId}`);
+      if (!opnameResponse.ok) {
+        throw new Error('Fout bij ophalen opname data');
+      }
+
+      const opnameData = await opnameResponse.json();
+      
+      // Laad building data
+      setBuildingData({
+        buildingName: opnameData.gebouwnaam || '',
+        address: opnameData.adres || '',
+        buildingType: opnameData.gebouwtype || '',
+        contactPerson: opnameData.contactpersoon || '',
+        date: opnameData.datum_opname ? new Date(opnameData.datum_opname).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      });
+
+      // Laad antwoorden en foto's
+      const loadedAnswers: Record<string, string> = {};
+      
+      // Laad antwoorden
+      if (opnameData.antwoorden) {
+        opnameData.antwoorden
+          .filter((antwoord: any) => antwoord.sectie_naam === 'gebouwmanagement')
+          .forEach((antwoord: any) => {
+            if (antwoord.antwoord_waarde) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_waarde;
+            } else if (antwoord.antwoord_nummer !== null) {
+              loadedAnswers[antwoord.vraag_id] = String(antwoord.antwoord_nummer);
+            } else if (antwoord.antwoord_boolean !== null) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_boolean ? 'true' : 'false';
+            }
+          });
+      }
+      
+      // Laad sectie foto's
+      const fotoIdsMap = new Map<string, string>();
+      if (opnameData.sectieFotos) {
+        opnameData.sectieFotos
+          .filter((foto: any) => foto.sectie_naam === 'gebouwmanagement')
+          .forEach((foto: any) => {
+            if (foto.vraag_id && foto.bestandspad) {
+              loadedAnswers[foto.vraag_id] = foto.bestandspad.replace(/^public\//, '/');
+              if (foto.id) {
+                fotoIdsMap.set(foto.vraag_id, foto.id);
+              }
+            }
+          });
+      }
+      setPhotoIds(fotoIdsMap);
+      
+      setAnswers(loadedAnswers);
+    } catch (error) {
+      console.error('Fout bij laden antwoorden:', error);
+    }
+  };
 
   const handleAnswerChange = (questionId: string, value: string) => {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     
+    // Alleen naar localStorage schrijven als er geen opnameId is (backward compatibility)
+    if (!opnameId) {
+      try {
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
     parsedData.gebouwmanagement = newAnswers;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      } catch (error) {
+        console.error('localStorage quota exceeded:', error);
+      }
+    }
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    const allData = {
-      ...answers,
-      section: 'gebouwmanagement',
-      timestamp: new Date().toISOString()
-    };
-    
+      const allData = {
+        ...answers,
+        section: 'gebouwmanagement',
+        timestamp: new Date().toISOString()
+      };
+      
       await saveAnswersToDatabase(
         opnameId,
         'gebouwmanagement',
@@ -428,12 +511,12 @@ export default function GebouwmanagementPage() {
 
   const handleNext = async () => {
     await handleSave();
-    router.push('/opnamen/voltooid');
+    router.push(`/opnamen/voltooid/${opnameId}`);
   };
 
   const handlePrevious = async () => {
     await handleSave();
-    router.push('/opnamen/zonwering');
+    router.push(`/opnamen/${opnameId}/zonwering`);
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
@@ -602,7 +685,7 @@ export default function GebouwmanagementPage() {
       <Header onSave={handleSave} />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <TimelineNavigation />
+          <TimelineNavigation onSave={handleSave} />
           
           <div className="bg-white rounded-lg shadow-xl overflow-hidden">
             <div className="bg-[#c7d316]/10 p-6 flex items-center justify-between">

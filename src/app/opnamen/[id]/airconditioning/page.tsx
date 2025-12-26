@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import TimelineNavigation from '@/components/TimelineNavigation';
 import Header from '@/components/Header';
 import { useOpnameId } from '@/lib/useOpname';
 import { saveAnswersToDatabase } from '@/lib/save-answers';
 import { uploadPhotoToDatabase } from '@/lib/photo-handler';
+import { deleteSectieFoto } from '@/lib/opname-api';
 
 interface BuildingData {
   buildingName: string;
@@ -17,12 +18,21 @@ interface BuildingData {
 }
 
 export default function AirconditioningPage() {
+  const params = useParams();
+  const opnameId = params?.id as string;
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<Map<string, File>>(new Map());
+  const [photoIds, setPhotoIds] = useState<Map<string, string>>(new Map()); // Map van vraagId -> fotoId
   const router = useRouter();
-  const [opnameId] = useOpnameId();
+  const [, setOpnameId] = useOpnameId();
+
+  useEffect(() => {
+    if (opnameId) {
+      setOpnameId(opnameId);
+    }
+  }, [opnameId, setOpnameId]);
 
   const questions = [
     // Sectie 1: Regeling afgifte-unit (koude-paneel, fancoil unit, binnen unit airco)
@@ -487,6 +497,10 @@ export default function AirconditioningPage() {
   ];
 
   useEffect(() => {
+    if (opnameId) {
+      loadAnswersFromDatabase();
+    } else {
+      // Fallback naar localStorage voor backward compatibility
     const savedBuildingData = localStorage.getItem('gacsBuildingData');
     if (savedBuildingData) {
       setBuildingData(JSON.parse(savedBuildingData));
@@ -499,40 +513,126 @@ export default function AirconditioningPage() {
         setAnswers(parsedAnswers.airconditioning);
       }
     }
-  }, []);
+    }
+  }, [opnameId]);
+
+  const loadAnswersFromDatabase = async () => {
+    if (!opnameId) return;
+
+    try {
+      // Laad alle data in één keer via de opname endpoint
+      const opnameResponse = await fetch(`/api/opnamen/${opnameId}`);
+      if (!opnameResponse.ok) {
+        throw new Error('Fout bij ophalen opname data');
+      }
+
+      const opnameData = await opnameResponse.json();
+      
+      // Laad building data
+      setBuildingData({
+        buildingName: opnameData.gebouwnaam || '',
+        address: opnameData.adres || '',
+        buildingType: opnameData.gebouwtype || '',
+        contactPerson: opnameData.contactpersoon || '',
+        date: opnameData.datum_opname ? new Date(opnameData.datum_opname).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      });
+
+      // Laad antwoorden en foto's
+      const loadedAnswers: Record<string, string> = {};
+      
+      // Laad antwoorden
+      if (opnameData.antwoorden) {
+        opnameData.antwoorden
+          .filter((antwoord: any) => antwoord.sectie_naam === 'airconditioning')
+          .forEach((antwoord: any) => {
+            if (antwoord.antwoord_waarde) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_waarde;
+            } else if (antwoord.antwoord_nummer !== null) {
+              loadedAnswers[antwoord.vraag_id] = String(antwoord.antwoord_nummer);
+            } else if (antwoord.antwoord_boolean !== null) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_boolean ? 'true' : 'false';
+            }
+          });
+      }
+      
+      // Laad sectie foto's
+      const fotoIdsMap = new Map<string, string>();
+      if (opnameData.sectieFotos) {
+        opnameData.sectieFotos
+          .filter((foto: any) => foto.sectie_naam === 'airconditioning')
+          .forEach((foto: any) => {
+            // Foto's worden getoond via bestandspad (relatief pad vanaf public/)
+            if (foto.vraag_id && foto.bestandspad) {
+              // Bestandspad is relatief vanaf public/, dus we kunnen het direct gebruiken
+              loadedAnswers[foto.vraag_id] = foto.bestandspad.replace(/^public\//, '/');
+              // Sla fotoId op voor later verwijderen
+              if (foto.id) {
+                fotoIdsMap.set(foto.vraag_id, foto.id);
+              }
+            }
+          });
+      }
+      setPhotoIds(fotoIdsMap);
+      
+      setAnswers(loadedAnswers);
+    } catch (error) {
+      console.error('Fout bij laden antwoorden:', error);
+    }
+  };
 
   const handleAnswerChange = (questionId: string, value: string) => {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     
+    // Alleen naar localStorage schrijven als er geen opnameId is (backward compatibility)
+    if (!opnameId) {
+      try {
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
     parsedData.airconditioning = newAnswers;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      } catch (error) {
+        // localStorage quota exceeded - skip silently als we opnameId hebben
+        if (opnameId) {
+          console.warn('localStorage quota exceeded, maar data wordt opgeslagen in database');
+        } else {
+          console.error('localStorage quota exceeded:', error);
+        }
+      }
+    }
   };
 
-  const handleSave = () => {
-    // Sla antwoorden op
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
       const allData = {
         ...answers,
         section: 'airconditioning',
         timestamp: new Date().toISOString()
       };
       
-      const existingData = localStorage.getItem('gacsOpnamenData');
-      const parsedData = existingData ? JSON.parse(existingData) : {};
-      parsedData.airconditioning = allData;
-      localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      await saveAnswersToDatabase(
+        opnameId,
+        'airconditioning',
+        allData,
+        questions,
+        'basis'
+      );
+    } catch (error) {
+      console.error('Fout bij opslaan:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
       
-  const handleNext = () => {
-    handleSave();
-      router.push('/opnamen/ventilatie');
+  const handleNext = async () => {
+    await handleSave();
+    router.push(`/opnamen/${opnameId}/ventilatie`);
   };
 
-  const handlePrevious = () => {
-    handleSave();
-      router.push('/opnamen/warm-tapwater');
+  const handlePrevious = async () => {
+    await handleSave();
+    router.push(`/opnamen/${opnameId}/warm-tapwater`);
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
@@ -622,25 +722,48 @@ export default function AirconditioningPage() {
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
+                  const vraagId = question.id as string;
+                  
+                  // Verwijder oude foto eerst (als die bestaat)
+                  if (opnameId) {
+                    const oldFotoId = photoIds.get(vraagId);
+                    if (oldFotoId) {
+                      try {
+                        await deleteSectieFoto(opnameId, 'airconditioning', oldFotoId);
+                        setPhotoIds(prev => {
+                          const newMap = new Map(prev);
+                          newMap.delete(vraagId);
+                          return newMap;
+                        });
+                      } catch (error) {
+                        console.error('Fout bij verwijderen oude foto:', error);
+                        // Ga door met uploaden nieuwe foto
+                      }
+                    }
+                  }
+                  
                   // Sla File object op voor database upload
-                  setPhotoFiles(prev => new Map(prev).set(question.id as string, file));
+                  setPhotoFiles(prev => new Map(prev).set(vraagId, file));
                   
                   // Toon preview (base64 voor display)
                   const reader = new FileReader();
                   reader.onload = (event) => {
-                    handleAnswerChange(question.id as string, event.target?.result as string);
+                    handleAnswerChange(vraagId, event.target?.result as string);
                   };
                   reader.readAsDataURL(file);
 
                   // Upload direct naar database als opnameId beschikbaar is
                   if (opnameId) {
                     try {
-                      await uploadPhotoToDatabase(
+                      const newFotoId = await uploadPhotoToDatabase(
                         opnameId,
                         'airconditioning',
                         file,
-                        question.id as string
+                        vraagId
                       );
+                      if (newFotoId) {
+                        setPhotoIds(prev => new Map(prev).set(vraagId, newFotoId));
+                      }
                     } catch (error) {
                       console.error('Fout bij direct uploaden foto:', error);
                       // Foto wordt later geüpload bij handleSave
@@ -659,11 +782,32 @@ export default function AirconditioningPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => {
-                    handleAnswerChange(question.id as string, '');
+                  onClick={async () => {
+                    const vraagId = question.id as string;
+                    
+                    // Verwijder foto uit database als opnameId beschikbaar is
+                    if (opnameId) {
+                      const fotoId = photoIds.get(vraagId);
+                      if (fotoId) {
+                        try {
+                          await deleteSectieFoto(opnameId, 'airconditioning', fotoId);
+                        } catch (error) {
+                          console.error('Fout bij verwijderen foto uit database:', error);
+                          // Ga door met verwijderen uit state
+                        }
+                      }
+                    }
+                    
+                    // Verwijder uit state
+                    handleAnswerChange(vraagId, '');
                     setPhotoFiles(prev => {
                       const newMap = new Map(prev);
-                      newMap.delete(question.id as string);
+                      newMap.delete(vraagId);
+                      return newMap;
+                    });
+                    setPhotoIds(prev => {
+                      const newMap = new Map(prev);
+                      newMap.delete(vraagId);
                       return newMap;
                     });
                   }}
@@ -701,7 +845,7 @@ export default function AirconditioningPage() {
       <Header onSave={handleSave} />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <TimelineNavigation />
+          <TimelineNavigation onSave={handleSave} />
           
           <div className="bg-white rounded-lg shadow-xl overflow-hidden">
             <div className="bg-[#c7d316]/10 p-6 flex items-center justify-between">

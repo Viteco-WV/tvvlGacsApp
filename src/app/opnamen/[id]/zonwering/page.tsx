@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import TimelineNavigation from '@/components/TimelineNavigation';
 import Header from '@/components/Header';
 import { useOpnameId } from '@/lib/useOpname';
 import { saveAnswersToDatabase } from '@/lib/save-answers';
 import { uploadPhotoToDatabase } from '@/lib/photo-handler';
+import { deleteSectieFoto } from '@/lib/opname-api';
 
 interface BuildingData {
   buildingName: string;
@@ -16,55 +17,65 @@ interface BuildingData {
   date: string;
 }
 
-export default function GebouwmanagementPage() {
+export default function ZonweringPage() {
+  const params = useParams();
+  const opnameId = params?.id as string;
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<Map<string, File>>(new Map());
+  const [photoIds, setPhotoIds] = useState<Map<string, string>>(new Map()); // Map van vraagId -> fotoId
   const router = useRouter();
-  const [opnameId] = useOpnameId();
+  const [, setOpnameId] = useOpnameId();
+
+  useEffect(() => {
+    if (opnameId) {
+      setOpnameId(opnameId);
+    }
+  }, [opnameId, setOpnameId]);
 
   const questions = [
-    // Sectie 1: Regeling setpoint
+    // Sectie 1: Regeling zonwering
     {
-      id: 'setpoint_van_toepassing',
+      id: 'regeling_zonwering_van_toepassing',
       question: 'Vraag 1.1 - Van toepassing?',
       type: 'radio',
       options: ['Ja', 'Nee'],
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling zonwering'
     },
     {
-      id: 'setpoint_regeling',
-      question: 'Vraag 1.2 - Hoe is de regeling setpoint?',
+      id: 'regeling_zonwering_type',
+      question: 'Vraag 1.2 - Hoe is de regeling zonwering?',
       type: 'select',
       options: [
-        'Handmatige setpoint instelling per ruimte',
-        'Setpoint instelling alleen vanuit GEDECENTRALISEERDE technische ruimtes',
-        'Setpoint instelling vanuit een centraal punt',
-        'Setpoint instelling vanuit een centraal punt met regelmatige overschrijving van gebruikersinstellingen'
+        'Handmatige bediening',
+        'Handmatige bediening met motor',
+        'Automatisch regeling met motor',
+        'Gecombineerde verlichting / zonwering / verwarming en koeling regeling'
       ],
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'regeling_zonwering_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
-    },    {
-      id: 'setpoint_foto',
+      section: '1 - Regeling zonwering'
+    },
+    {
+      id: 'regeling_zonwering_foto',
       question: 'Foto uploaden',
       type: 'file',
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'regeling_zonwering_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling zonwering'
     },
     {
-      id: 'setpoint_notities',
+      id: 'regeling_zonwering_notities',
       question: 'Notities over de opnamen',
       type: 'textarea',
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'regeling_zonwering_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
+      section: '1 - Regeling zonwering'
     },
 
-    {
-      id: 'setpoint_verbetermaatregel',
+        {
+      id: 'regeling_zonwering_verbetermaatregel',
       question: 'Vraag 1.3 - Te nemen verbetermaatregel',
       type: 'select',
       options: [
@@ -72,313 +83,17 @@ export default function GebouwmanagementPage() {
         'Naar klasse B',
         'Naar klasse A'
       ],
-      conditional: 'setpoint_van_toepassing',
+      conditional: 'regeling_zonwering_van_toepassing',
       conditionalValue: 'Ja',
-      section: '1 - Regeling setpoint'
-    },
-    // Sectie 2: Runtime regeling
-    {
-      id: 'runtime_van_toepassing',
-      question: 'Vraag 2.1 - Van toepassing?',
-      type: 'radio',
-      options: ['Ja', 'Nee'],
-      section: '2 - Runtime regeling'
-    },
-    {
-      id: 'runtime_regeling',
-      question: 'Vraag 2.2 - Hoe is de runtime regeling?',
-      type: 'select',
-      options: [
-        'Handmatige instelling',
-        'Individuele tijdgestuurde regeling met vaste schakelpunten',
-        'Individuele tijdgestuurde regeling met variabele schakelpunten'
-      ],
-      conditional: 'runtime_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
-    },    {
-      id: 'runtime_foto',
-      question: 'Foto uploaden',
-      type: 'file',
-      conditional: 'runtime_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
-    },
-    {
-      id: 'runtime_notities',
-      question: 'Notities over de opnamen',
-      type: 'textarea',
-      conditional: 'runtime_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
-    },
-
-    {
-      id: 'runtime_verbetermaatregel',
-      question: 'Vraag 2.3 - Te nemen verbetermaatregel',
-      type: 'select',
-      options: [
-        'Naar klasse C',
-        'Naar klasse B',
-        'Naar klasse A'
-      ],
-      conditional: 'runtime_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '2 - Runtime regeling'
-    },
-    // Sectie 3: Storingsdetectie en foutdiagnose
-    {
-      id: 'storingsdetectie_van_toepassing',
-      question: 'Vraag 3.1 - Van toepassing?',
-      type: 'radio',
-      options: ['Ja', 'Nee'],
-      section: '3 - Storingsdetectie en foutdiagnose'
-    },
-    {
-      id: 'storingsdetectie_regeling',
-      question: 'Vraag 3.2 - Hoe is de storingsdetectie en foutdiagnose?',
-      type: 'select',
-      options: [
-        'Geen centrale detectie van storingen en alarmen',
-        'Centrale indicatie van storingen of alarmen',
-        'Centrale indicatie van fouten of alarmen met diagnostische functies'
-      ],
-      conditional: 'storingsdetectie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
-    },    {
-      id: 'storingsdetectie_foto',
-      question: 'Foto uploaden',
-      type: 'file',
-      conditional: 'storingsdetectie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
-    },
-    {
-      id: 'storingsdetectie_notities',
-      question: 'Notities over de opnamen',
-      type: 'textarea',
-      conditional: 'storingsdetectie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
-    },
-
-    {
-      id: 'storingsdetectie_verbetermaatregel',
-      question: 'Vraag 3.3 - Te nemen verbetermaatregel',
-      type: 'select',
-      options: [
-        'Naar klasse C',
-        'Naar klasse B',
-        'Naar klasse A'
-      ],
-      conditional: 'storingsdetectie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '3 - Storingsdetectie en foutdiagnose'
-    },
-    // Sectie 4: Energieconsumptie en binnenklimaat rapportage
-    {
-      id: 'energieconsumptie_van_toepassing',
-      question: 'Vraag 4.1 - Van toepassing?',
-      type: 'radio',
-      options: ['Ja', 'Nee'],
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
-    },
-    {
-      id: 'energieconsumptie_regeling',
-      question: 'Vraag 4.2 - Hoe is de energieconsumptie en binnenklimaat rapportage?',
-      type: 'select',
-      options: [
-        'Alleen indicatie van gemeten waarden (zoals temperatuur, meterstanden)',
-        'Rapportage van trends in gemeten waarden en energieconsumptie',
-        'Analyse van gemeten waarden, bepaling van energieprestatie en benchmarking'
-      ],
-      conditional: 'energieconsumptie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
-    },    {
-      id: 'energieconsumptie_foto',
-      question: 'Foto uploaden',
-      type: 'file',
-      conditional: 'energieconsumptie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
-    },
-    {
-      id: 'energieconsumptie_notities',
-      question: 'Notities over de opnamen',
-      type: 'textarea',
-      conditional: 'energieconsumptie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
-    },
-
-    {
-      id: 'energieconsumptie_verbetermaatregel',
-      question: 'Vraag 4.3 - Te nemen verbetermaatregel',
-      type: 'select',
-      options: [
-        'Naar klasse C',
-        'Naar klasse B',
-        'Naar klasse A'
-      ],
-      conditional: 'energieconsumptie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '4 - Energieconsumptie en binnenklimaat rapportage'
-    },
-    // Sectie 5: Lokale energieproductie en hernieuwbare energie
-    {
-      id: 'lokale_energie_van_toepassing',
-      question: 'Vraag 5.1 - Van toepassing?',
-      type: 'radio',
-      options: ['Ja', 'Nee'],
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
-    },
-    {
-      id: 'lokale_energie_regeling',
-      question: 'Vraag 5.2 - Hoe is de lokale energieproductie en hernieuwbare energie?',
-      type: 'select',
-      options: [
-        'Geen (alle vormen van regeling van lokale energieproductie zijn toegestaan)',
-        'Ongereguleerde energieproductie, gebaseerd op de beschikbaarheid van de energiebron met teruglevering van energieoverschotten aan het net',
-        'Energie'
-      ],
-      conditional: 'lokale_energie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
-    },    {
-      id: 'lokale_energie_foto',
-      question: 'Foto uploaden',
-      type: 'file',
-      conditional: 'lokale_energie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
-    },
-    {
-      id: 'lokale_energie_notities',
-      question: 'Notities over de opnamen',
-      type: 'textarea',
-      conditional: 'lokale_energie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
-    },
-
-    {
-      id: 'lokale_energie_verbetermaatregel',
-      question: 'Vraag 5.3 - Te nemen verbetermaatregel',
-      type: 'select',
-      options: [
-        'Naar klasse C',
-        'Naar klasse B',
-        'Naar klasse A'
-      ],
-      conditional: 'lokale_energie_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '5 - Lokale energieproductie en hernieuwbare energie'
-    },
-    // Sectie 6: Hergebruik restwarmte en verschuiving warmtevraag
-    {
-      id: 'restwarmte_van_toepassing',
-      question: 'Vraag 6.1 - Van toepassing?',
-      type: 'radio',
-      options: ['Ja', 'Nee'],
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
-    },
-    {
-      id: 'restwarmte_regeling',
-      question: 'Vraag 6.2 - Hoe is het hergebruik restwarmte en verschuiving warmtevraag?',
-      type: 'select',
-      options: [
-        'Direct hergebruik van restwarmte of verschuiving warmtevraag',
-        'Gereguleerd gebruik van restwarmte en verschuiving warmtevraag (inclusief gebruik van thermische energieopslag)'
-      ],
-      conditional: 'restwarmte_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
-    },    {
-      id: 'restwarmte_foto',
-      question: 'Foto uploaden',
-      type: 'file',
-      conditional: 'restwarmte_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
-    },
-    {
-      id: 'restwarmte_notities',
-      question: 'Notities over de opnamen',
-      type: 'textarea',
-      conditional: 'restwarmte_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
-    },
-
-    {
-      id: 'restwarmte_verbetermaatregel',
-      question: 'Vraag 6.3 - Te nemen verbetermaatregel',
-      type: 'select',
-      options: [
-        'Naar klasse C',
-        'Naar klasse B',
-        'Naar klasse A'
-      ],
-      conditional: 'restwarmte_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '6 - Hergebruik restwarmte en verschuiving warmtevraag'
-    },
-    // Sectie 7: Smart grid integratie
-    {
-      id: 'smart_grid_van_toepassing',
-      question: 'Vraag 7.1 - Van toepassing?',
-      type: 'radio',
-      options: ['Ja', 'Nee'],
-      section: '7 - Smart grid integratie'
-    },
-    {
-      id: 'smart_grid_regeling',
-      question: 'Vraag 7.2 - Hoe is de smart grid integratie?',
-      type: 'select',
-      options: [
-        'Geen (alle vormen van smart grid integratie zijn toegestaan)',
-        'Geen coördinatie tussen energienetten (net) en gebouwsystemen',
-        'Coördinatie tussen energienetten (net) en gebouwsystemen met lastverschuiving'
-      ],
-      conditional: 'smart_grid_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
-    },
-    {
-      id: 'smart_grid_foto',
-      question: 'Foto uploaden',
-      type: 'file',
-      conditional: 'smart_grid_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
-    },
-    {
-      id: 'smart_grid_notities',
-      question: 'Notities over de opnamen',
-      type: 'textarea',
-      conditional: 'smart_grid_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
-    },
-
-        {
-      id: 'smart_grid_verbetermaatregel',
-      question: 'Vraag 7.3 - Te nemen verbetermaatregel',
-      type: 'select',
-      options: [
-        'Naar klasse C',
-        'Naar klasse B',
-        'Naar klasse A'
-      ],
-      conditional: 'smart_grid_van_toepassing',
-      conditionalValue: 'Ja',
-      section: '7 - Smart grid integratie'
+      section: '1 - Regeling zonwering'
     }
   ];
 
   useEffect(() => {
+    if (opnameId) {
+      loadAnswersFromDatabase();
+    } else {
+      // Fallback naar localStorage voor backward compatibility
     const savedBuildingData = localStorage.getItem('gacsBuildingData');
     if (savedBuildingData) {
       setBuildingData(JSON.parse(savedBuildingData));
@@ -387,40 +102,110 @@ export default function GebouwmanagementPage() {
     const savedAnswers = localStorage.getItem('gacsOpnamenData');
     if (savedAnswers) {
       const parsedAnswers = JSON.parse(savedAnswers);
-      if (parsedAnswers.gebouwmanagement) {
-        setAnswers(parsedAnswers.gebouwmanagement);
+      if (parsedAnswers.zonwering) {
+        setAnswers(parsedAnswers.zonwering);
       }
     }
-  }, []);
+    }
+  }, [opnameId]);
+
+  const loadAnswersFromDatabase = async () => {
+    if (!opnameId) return;
+
+    try {
+      // Laad alle data in één keer via de opname endpoint
+      const opnameResponse = await fetch(`/api/opnamen/${opnameId}`);
+      if (!opnameResponse.ok) {
+        throw new Error('Fout bij ophalen opname data');
+      }
+
+      const opnameData = await opnameResponse.json();
+      
+      // Laad building data
+      setBuildingData({
+        buildingName: opnameData.gebouwnaam || '',
+        address: opnameData.adres || '',
+        buildingType: opnameData.gebouwtype || '',
+        contactPerson: opnameData.contactpersoon || '',
+        date: opnameData.datum_opname ? new Date(opnameData.datum_opname).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      });
+
+      // Laad antwoorden en foto's
+      const loadedAnswers: Record<string, string> = {};
+      
+      // Laad antwoorden
+      if (opnameData.antwoorden) {
+        opnameData.antwoorden
+          .filter((antwoord: any) => antwoord.sectie_naam === 'zonwering')
+          .forEach((antwoord: any) => {
+            if (antwoord.antwoord_waarde) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_waarde;
+            } else if (antwoord.antwoord_nummer !== null) {
+              loadedAnswers[antwoord.vraag_id] = String(antwoord.antwoord_nummer);
+            } else if (antwoord.antwoord_boolean !== null) {
+              loadedAnswers[antwoord.vraag_id] = antwoord.antwoord_boolean ? 'true' : 'false';
+            }
+          });
+      }
+      
+      // Laad sectie foto's
+      const fotoIdsMap = new Map<string, string>();
+      if (opnameData.sectieFotos) {
+        opnameData.sectieFotos
+          .filter((foto: any) => foto.sectie_naam === 'zonwering')
+          .forEach((foto: any) => {
+            if (foto.vraag_id && foto.bestandspad) {
+              loadedAnswers[foto.vraag_id] = foto.bestandspad.replace(/^public\//, '/');
+              if (foto.id) {
+                fotoIdsMap.set(foto.vraag_id, foto.id);
+              }
+            }
+          });
+      }
+      setPhotoIds(fotoIdsMap);
+      
+      setAnswers(loadedAnswers);
+    } catch (error) {
+      console.error('Fout bij laden antwoorden:', error);
+    }
+  };
 
   const handleAnswerChange = (questionId: string, value: string) => {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     
+    // Alleen naar localStorage schrijven als er geen opnameId is (backward compatibility)
+    if (!opnameId) {
+      try {
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.gebouwmanagement = newAnswers;
+    parsedData.zonwering = newAnswers;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      } catch (error) {
+        console.error('localStorage quota exceeded:', error);
+      }
+    }
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-    const allData = {
-      ...answers,
-      section: 'gebouwmanagement',
-      timestamp: new Date().toISOString()
-    };
-    
+      const allData = {
+        ...answers,
+        section: 'zonwering',
+        timestamp: new Date().toISOString()
+      };
+      
       await saveAnswersToDatabase(
         opnameId,
-        'gebouwmanagement',
+        'zonwering',
         allData,
         questions,
         'basis'
       );
     } catch (error) {
       console.error('Fout bij opslaan:', error);
+      // Error wordt al afgehandeld in saveAnswersToDatabase (fallback naar localStorage)
     } finally {
       setIsSaving(false);
     }
@@ -428,12 +213,12 @@ export default function GebouwmanagementPage() {
 
   const handleNext = async () => {
     await handleSave();
-    router.push('/opnamen/voltooid');
+    router.push(`/opnamen/${opnameId}/gebouwmanagement`);
   };
 
   const handlePrevious = async () => {
     await handleSave();
-    router.push('/opnamen/zonwering');
+    router.push(`/opnamen/${opnameId}/verlichting`);
   };
 
   const renderQuestion = (question: Record<string, unknown>) => {
@@ -538,7 +323,7 @@ export default function GebouwmanagementPage() {
                     try {
                       await uploadPhotoToDatabase(
                         opnameId,
-                        'gebouwmanagement',
+                        'zonwering',
                         file,
                         question.id as string
                       );
@@ -602,16 +387,16 @@ export default function GebouwmanagementPage() {
       <Header onSave={handleSave} />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <TimelineNavigation />
+          <TimelineNavigation onSave={handleSave} />
           
           <div className="bg-white rounded-lg shadow-xl overflow-hidden">
             <div className="bg-[#c7d316]/10 p-6 flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-[#c7d314] rounded-lg flex items-center justify-center">
-                  <span className="text-[#343234] font-bold text-lg">7</span>
+                  <span className="text-[#343234] font-bold text-lg">6</span>
                 </div>
                 <h1 className="text-xl font-bold text-[#343234]">
-                  Technisch gebouwmanagement onderdelen
+                  Zonweringssystemen onderdelen
                 </h1>
               </div>
               <div className="bg-[#c7d316]/10 text-[#343234] px-3 py-1 rounded-full text-sm font-medium">

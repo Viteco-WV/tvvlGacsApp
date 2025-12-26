@@ -2,17 +2,31 @@
 
 import { useRouter } from 'next/navigation';
 
-export default function Header() {
+interface HeaderProps {
+  onSave?: () => Promise<void> | void;
+}
+
+export default function Header({ onSave }: HeaderProps) {
   const router = useRouter();
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Roep eerst de save functie aan als die beschikbaar is
+    if (onSave) {
+      try {
+        await onSave();
+      } catch (error) {
+        console.error('Fout bij opslaan:', error);
+        // Ga door met navigeren ook als er een fout is
+      }
+    }
+    // Navigeer naar overzicht
     router.push('/opnamen');
   };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="container mx-auto px-4 py-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="flex items-center">
             <div className="flex-1 flex justify-start">
               <img 

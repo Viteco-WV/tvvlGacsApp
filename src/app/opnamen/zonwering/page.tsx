@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TimelineNavigation from '@/components/TimelineNavigation';
 import Header from '@/components/Header';
+import { useOpnameId } from '@/lib/useOpname';
+import { saveAnswersToDatabase } from '@/lib/save-answers';
+import { uploadPhotoToDatabase } from '@/lib/photo-handler';
 
 interface BuildingData {
   buildingName: string;
@@ -16,7 +19,10 @@ interface BuildingData {
 export default function ZonweringPage() {
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [photoFiles, setPhotoFiles] = useState<Map<string, File>>(new Map());
   const router = useRouter();
+  const [opnameId] = useOpnameId();
 
   const questions = [
     // Sectie 1: Regeling zonwering
@@ -92,33 +98,44 @@ export default function ZonweringPage() {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     
+    // Backward compatibility: sla ook in localStorage voor directe feedback
     const existingData = localStorage.getItem('gacsOpnamenData');
     const parsedData = existingData ? JSON.parse(existingData) : {};
     parsedData.zonwering = newAnswers;
     localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
   };
 
-  const handleSave = () => {
-    // Sla antwoorden op
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
     const allData = {
       ...answers,
       section: 'zonwering',
       timestamp: new Date().toISOString()
     };
     
-    const existingData = localStorage.getItem('gacsOpnamenData');
-    const parsedData = existingData ? JSON.parse(existingData) : {};
-    parsedData.zonwering = allData;
-    localStorage.setItem('gacsOpnamenData', JSON.stringify(parsedData));
+      await saveAnswersToDatabase(
+        opnameId,
+        'zonwering',
+        allData,
+        questions,
+        'basis'
+      );
+    } catch (error) {
+      console.error('Fout bij opslaan:', error);
+      // Error wordt al afgehandeld in saveAnswersToDatabase (fallback naar localStorage)
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleNext = () => {
-    handleSave();
+  const handleNext = async () => {
+    await handleSave();
     router.push('/opnamen/gebouwmanagement');
   };
 
-  const handlePrevious = () => {
-    handleSave();
+  const handlePrevious = async () => {
+    await handleSave();
     router.push('/opnamen/verlichting');
   };
 
@@ -206,14 +223,33 @@ export default function ZonweringPage() {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
+                  // Sla File object op voor database upload
+                  setPhotoFiles(prev => new Map(prev).set(question.id as string, file));
+                  
+                  // Toon preview (base64 voor display)
                   const reader = new FileReader();
                   reader.onload = (event) => {
                     handleAnswerChange(question.id as string, event.target?.result as string);
                   };
                   reader.readAsDataURL(file);
+
+                  // Upload direct naar database als opnameId beschikbaar is
+                  if (opnameId) {
+                    try {
+                      await uploadPhotoToDatabase(
+                        opnameId,
+                        'zonwering',
+                        file,
+                        question.id as string
+                      );
+                    } catch (error) {
+                      console.error('Fout bij direct uploaden foto:', error);
+                      // Foto wordt later geüpload bij handleSave
+                    }
+                  }
                 }
               }}
               className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c7d316] focus:border-transparent bg-white text-gray-900"
@@ -227,7 +263,14 @@ export default function ZonweringPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => handleAnswerChange(question.id as string, '')}
+                  onClick={() => {
+                    handleAnswerChange(question.id as string, '');
+                    setPhotoFiles(prev => {
+                      const newMap = new Map(prev);
+                      newMap.delete(question.id as string);
+                      return newMap;
+                    });
+                  }}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors duration-200"
                   title="Verwijder foto"
                 >
@@ -259,7 +302,7 @@ export default function ZonweringPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f9fb]">
-      <Header />
+      <Header onSave={handleSave} />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <TimelineNavigation />
